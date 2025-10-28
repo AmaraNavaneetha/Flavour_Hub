@@ -1,0 +1,85 @@
+﻿@model restapp.Models.Category
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+<h1>Edit</h1>
+
+<h4>Category</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="CategoryId" />
+            <div class="form-group">
+                <label asp-for="CategoryName" class="control-label"></label>
+                <input asp-for="CategoryName" class="form-control" />
+                <span asp-validation-for="CategoryName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CategoryDescription" class="control-label"></label>
+                <textarea asp-for="CategoryDescription" class="form-control"></textarea>
+                <span asp-validation-for="CategoryDescription" class="text-danger"></span>
+            </div>
+            
+
+            <div class="form-group">
+                <label asp-for="CategoryImagePath" class="control-label">Current Image</label>
+                <img src="@Url.Content(Model.CategoryImagePath)"
+                        width="600"
+                        height="150"
+                        alt="@Model.CategoryName"/>
+                <span asp-validation-for="CategoryImagePath" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CategoryImagePath" class="control-label">Selected New Category Image</label>
+                <img id="CategoryImagePreview" 
+                    class="form-control" 
+                    width="600" 
+                    height="150"/>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Select New Category Image</label>
+                <input type="file" 
+                    name="CategoryImage" 
+                    class="form-control" 
+                    onchange="DisplayImage(event)"/>
+                <span asp-validation-for="CategoryImage" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="CategoryStatus" /> @Html.DisplayNameFor(model => model.CategoryStatus)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="CategoryDiscount" class="control-label"></label>
+                <input asp-for="CategoryDiscount" class="form-control" />
+                <span asp-validation-for="CategoryDiscount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    var DisplayImage = function(event)
+    {
+        //the file which is selected by type="file" then it is given as input type"event" to the function
+        //target is an object which refers to the image that is selected 
+        console.log(event.target.value);
+        var previewImage = document.getElementById("CategoryImagePreview");
+        console.log(event.target.files[0]);
+        previewImage.src = URL.createObjectURL(event.target.files[0]);       
+    }
+</script>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

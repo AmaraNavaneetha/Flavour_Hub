@@ -1,0 +1,77 @@
+﻿@using System.Collections.Generic;
+@using System.Collections;
+@using restapp.Services;
+@using restapp.Dal;
+@using Microsoft.EntityFrameworkCore;
+
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+@* this is called razor code *@
+
+@{
+    DBServices dbs = new DBServices();
+
+    List<Sliders> sliders = dbs.GetAllSliders();
+}
+
+<div id="carouselExampleCaptions" class="carousel slide">
+  <div class="carousel-indicators">
+        @{
+            string activeSlide = "";
+            int i = 0;
+
+            foreach(Sliders s in sliders)
+            {
+                activeSlide = s.DisplayOrderNo == 1 ? "active" : " ";
+                <button type="button" 
+                    data-bs-target="#carouselExampleCaptions" 
+                    data-bs-slide-to="@i" 
+                    class="@activeSlide" 
+                    aria-current="true" 
+                aria-label="Slide (@i+1)"></button>
+                i = i + 1;
+            }
+        }
+    </div>
+
+
+    <div class="carousel-inner">
+        @{
+            int index = 0;
+            var groupedSliders = sliders.Select((s, i) => new { s, i })
+            .GroupBy(x => x.i);
+        }
+        @foreach (var group in groupedSliders)
+        {
+            var activeslide = group.Key == 0 ? "active" : "";
+            <div class="carousel-item @activeslide">
+                <div class="row">
+                    @foreach (var item in group)
+                    {
+                        <div class="col-12">
+                            <img src="@Url.Content(item.s.SliderImagePath)"
+                                 class="d-block w-100"
+                                 style="height: 450px; object-fit: cover;"
+                                 alt="@item.s.Name"/>
+                            <div class="carousel-caption d-none d-md-block">
+                                <h5>@item.s.Name</h5>
+                                <p>@item.s.DisplayText</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>

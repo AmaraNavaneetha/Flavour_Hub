@@ -1,0 +1,130 @@
+﻿@model IEnumerable<restapp.Models.FoodItem>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ItemName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ItemDescription)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ActualPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DiscountPer)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SellingPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rating)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RatingCount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ItemImagePath)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsAvailable)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsBestSeller)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsFastMoving)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsBreakfast)
+            </th>
+             <th>
+                @Html.DisplayNameFor(model => model.IsLunch)
+            </th>
+             <th>
+                @Html.DisplayNameFor(model => model.IsDinner)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.category)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.itemType)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ItemName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ItemDescription)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ActualPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DiscountPer)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SellingPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Rating)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RatingCount)
+            </td>
+            <td>
+                <img src="@Url.Content(item.ItemImagePath)" 
+                alt="@item.ItemName" 
+                width="300" 
+                height="150"/>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsAvailable)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsBestSeller)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsFastMoving)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsBreakfast)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsLunch)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsDinner)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.category.CategoryName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.itemType.ItemTypeName)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ItemId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ItemId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.ItemId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

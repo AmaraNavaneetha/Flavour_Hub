@@ -1,0 +1,91 @@
+﻿@model restapp.Models.Sliders
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h1>Edit</h1>
+
+<h4>Slider</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="SliderId" />
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DisplayText" class="control-label"></label>
+                <input asp-for="DisplayText" class="form-control" />
+                <span asp-validation-for="DisplayText" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LinkText" class="control-label"></label>
+                <input asp-for="LinkText" class="form-control" />
+                <span asp-validation-for="LinkText" class="text-danger"></span>
+            </div>
+
+
+            <div class="form-group">
+                <label asp-for="SliderImagePath" class="control-label">Current Image</label>
+                <img src="@Url.Content(Model.SliderImagePath)"
+                        width="600"
+                        height="150"
+                        alt="@Model.Name"/>
+                <span asp-validation-for="SliderImagePath" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="SliderImagePath" class="control-label">Selected New Slider Image</label>
+                <img id="SliderImagePreview" 
+                    class="form-control" 
+                    width="600" 
+                    height="150"/>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Select New Slider Image</label>
+                <input type="file" 
+                    name="SliderImage" 
+                    class="form-control" 
+                    onchange="DisplayImage(event)"/>
+                <span asp-validation-for="SliderImage" class="text-danger"></span>
+            </div>
+                
+
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Status" /> @Html.DisplayNameFor(model => model.Status)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="DisplayOrderNo" class="control-label"></label>
+                <input asp-for="DisplayOrderNo" class="form-control" />
+                <span asp-validation-for="DisplayOrderNo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    var DisplayImage = function(event)
+    {
+        //the file which is selected by type="file" then it is given as input type"event" to the function
+        //target is an object which refers to the image that is selected 
+        console.log(event.target.value);
+        var previewImage = document.getElementById("SliderImagePreview");
+        console.log(event.target.files[0]);
+        previewImage.src = URL.createObjectURL(event.target.files[0]);       
+    }
+</script>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

@@ -1,0 +1,47 @@
+﻿@using restapp.Services
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Menu Page";
+}
+@{
+    DBServices dbs = new DBServices();
+    List<Category> categoryList = dbs.GetAllCategories();
+}
+<div class="text-center">
+    <h1 class="display-4">Welcome to the Queen's Kitchen Menu Bar</h1>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+
+    @foreach (Category categorytype in categoryList)
+
+    {
+                <div class="col">
+                <div class="card h-100">
+                <img src="@Url.Content(categorytype.CategoryImagePath)"
+
+                                     class="card-img-top img-fluid"
+
+                                     alt="@categorytype.CategoryName"
+                                     style="height :200px; object-fit:cover;"/>
+                <div class="card-body">
+                <h5 class="card-title">@categorytype.CategoryName</h5>
+                <p class="card-text">
+
+                                        @(categorytype.CategoryDescription.Length > 50
+
+                                                            ? categorytype.CategoryDescription.Substring(0, 50) + "..."
+
+                                                            : categorytype.CategoryDescription)
+                </p>
+                </div>
+                <div class="card-footer">
+                <a href="#" class="card-link">See all</a>
+                </div>
+                </div>
+                </div>
+
+        }
+</div>

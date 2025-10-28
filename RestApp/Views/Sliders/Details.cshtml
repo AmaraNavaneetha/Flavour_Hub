@@ -1,0 +1,58 @@
+﻿@model restapp.Models.Sliders
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Slider</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DisplayText)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DisplayText)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.LinkText)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.LinkText)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.SliderImagePath)
+        </dt>
+        <dd class = "col-sm-10">
+            <img src="@Url.Content(Model.SliderImagePath)"
+                    width="600"
+                    height="375"
+                    alt="@Model.Name"/>
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Status)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DisplayOrderNo)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DisplayOrderNo)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.SliderId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

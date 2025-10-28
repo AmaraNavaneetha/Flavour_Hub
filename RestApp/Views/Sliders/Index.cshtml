@@ -1,0 +1,69 @@
+﻿@model IEnumerable<restapp.Models.Sliders>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DisplayText)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LinkText)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SliderImagePath)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DisplayOrderNo)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DisplayText)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LinkText)
+            </td>
+            <td>
+                <img src="@Url.Content(item.SliderImagePath)" 
+                alt="@item.Name" 
+                width="300" 
+                height="900"/>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DisplayOrderNo)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.SliderId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.SliderId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.SliderId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

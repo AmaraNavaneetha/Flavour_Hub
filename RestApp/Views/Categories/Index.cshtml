@@ -1,0 +1,96 @@
+﻿@using restapp.Dal
+@model PaginatedList<restapp.Models.Category>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<form asp-action="Index" method="get">
+    <div class="form-actions no-color">
+        <p>
+            <label>Find by Category Name: <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" /></label>
+            <input type="submit" value="Search" class="btn btn-default" /> |
+            <a asp-action="Index">Back to Full List</a>
+        </p>
+    </div>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                
+                <a asp-action="Index" 
+                   asp-route-sortOrder="@ViewData["NameSortParm"]" 
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]">CategoryName</a>
+                
+            </th>
+            <th>
+                Description
+            </th>
+            <th>
+                CategoryImage
+            </th>
+            <th>
+                Status)
+            </th>
+            <th>
+                <a asp-action="Index" 
+                   asp-route-sortOrder="@ViewData["DiscountSortParm"]" 
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]">Discount</a>
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.CategoryName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CategoryDescription)
+            </td>
+             <td>
+                    <img src="@Url.Content(item.CategoryImagePath)" 
+                    alt="@item.CategoryName" width="300" height="150" />
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CategoryStatus)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CategoryDiscount)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.CategoryId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.CategoryId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.CategoryId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>
