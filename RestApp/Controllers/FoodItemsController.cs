@@ -21,24 +21,104 @@ namespace restapp.Controllers
         }
 
         // GET: FoodItems
-        public IActionResult Index()
+        // GET: FoodItems
+        public async Task<IActionResult> Index(
+            string sortOrder,
+            string currentFilter,
+            string searchString,
+            int? pageNumber, int? CategoryId)
         {
+
+
+
             //get values from session
             string loggedInUser = HttpContext.Session.GetString("loggedinuser");
+
             string loggedinuserRole = HttpContext.Session.GetString("loggedinuserRole");
 
             if (loggedInUser != null && loggedinuserRole == "Admin")
+
             {
                 ViewBag.loggedInUserId = loggedInUser;
-                List<FoodItem> foodItemList = _context.fooditems.Include("category").Include("itemType").ToList();
-                return View(foodItemList); // returns slider's   Index.cshtml + _LayoutAdmin.cshtml
+                ViewData["CurrentSort"] = sortOrder;
+                ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+                ViewData["sellingpriceSortParm"] = sortOrder == "sellingprice" ? "sellingprice_desc" : "sellingprice";
+                ViewData["ratingSortParm"] = sortOrder == "rating" ? "rating_desc" : "rating";
+
+                List<SelectListItem> optionsList = new List<SelectListItem>();
+                foreach (Category c in _context.categories)
+                {
+                    if (CategoryId == c.CategoryId)
+                    {
+                        optionsList.Add(new SelectListItem(c.CategoryName, c.CategoryId.ToString(), true));
+                    }
+                    else
+                    {
+                        optionsList.Add(new SelectListItem(c.CategoryName, c.CategoryId.ToString(), false));
+                    }
+                }
+                ViewBag.CategoryId = optionsList;
+
+                if (searchString != null)
+                {
+                    pageNumber = 1;
+                }
+                else
+                {
+                    searchString = currentFilter;
+                }
+
+                ViewData["CurrentFilter"] = searchString;
+                IQueryable<FoodItem>? fitems;
+                if (CategoryId != null)
+                {
+                    fitems = (from s in _context.fooditems.Include("category").Include("itemType")
+                              where s.CategoryId == CategoryId
+                              select s);
+                }
+                else
+                {
+                    fitems = (from s in _context.fooditems.Include("category").Include("itemType")
+                              select s);
+                }
+
+
+                if (!String.IsNullOrEmpty(searchString))
+                {
+                    fitems = fitems.Where(s => s.ItemName.Contains(searchString));
+                }
+
+                switch (sortOrder)
+                {
+                    case "name_desc":
+                        fitems = fitems.OrderByDescending(s => s.ItemName);
+                        break;
+                    case "sellingprice":
+                        fitems = fitems.OrderBy(s => s.SellingPrice);
+                        break;
+                    case "sellingprice_desc":
+                        fitems = fitems.OrderByDescending(s => s.SellingPrice);
+                        break;
+                    case "rating":
+                        fitems = fitems.OrderBy(s => s.Rating);
+                        break;
+                    case "rating_desc":
+                        fitems = fitems.OrderByDescending(s => s.Rating);
+                        break;
+                    default:
+                        fitems = fitems.OrderBy(s => s.ItemName);
+                        break;
+                }
+                int pageSize = 3;
+                return View(await PaginatedList<FoodItem>.CreateAsync(fitems.AsNoTracking(), pageNumber ?? 1, pageSize));
+                //return View(await fitems.AsNoTracking().ToListAsync());
+
             }
             else
             {
                 return RedirectToAction("Login", "User"); // Login.cshtml + _Layout.cshtml
             }
         }
-
         // GET: FoodItems/Details/5
         [HttpGet]
         public IActionResult Details(int Id)

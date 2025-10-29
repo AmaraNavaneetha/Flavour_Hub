@@ -1,36 +1,35 @@
 ﻿@model restapp.Models.UserLogin
-
 @{
     ViewData["Title"] = "Login";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
-<h1>Login</h1>
-
-<h4>UserLogin</h4>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="ValidateUser">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label"></label>
-                <input asp-for="UserId" class="form-control" />
-                <span asp-validation-for="UserId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Password" class="control-label"></label>
-                <input asp-for="Password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Signin" class="btn btn-primary" />
-            </div>
+
+<div class="container mt-5" style="max-width: 400px;">
+    <form asp-action="ValidateUser">
+    <h2 class="text-center mb-4">Login</h2>
+    
+        <div class="form-group mb-3">
+            <input asp-for="UserId" class="form-control" placeholder="Enter Username" />
+            <span asp-validation-for="UserId" class="text-danger"></span>
+        </div>
+        <div class="form-group mb-3">
+            <input asp-for="Password" class="form-control" placeholder="Enter Password" type="password" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        
+        
+        <div class="form-actions">
+<button type="submit" class="btn btn-success">Login</button>
+<p class="text-center mt-3">
+        New User ? Register Here! <a asp-action="Register" asp-controller="User" class="btn btn-success">Register</a>
+</p>
+</div>
         </form>
-    </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
 
