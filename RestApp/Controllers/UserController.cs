@@ -22,6 +22,7 @@ namespace restapp.Controllers
         }
        
 
+
         public IActionResult Logout() // removing the user logged in details from the session
         {
             HttpContext.Session.Remove("loggedinuser");

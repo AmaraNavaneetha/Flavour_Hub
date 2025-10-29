@@ -7,8 +7,7 @@
 
 <div class="container mt-5" style="max-width: 400px;">
     <form asp-action="ValidateUser">
-    <h2 class="text-center mb-4">Login</h2>
-    
+        <h2 class="text-center mb-4">Login</h2>
         <div class="form-group mb-3">
             <input asp-for="UserId" class="form-control" placeholder="Enter Username" />
             <span asp-validation-for="UserId" class="text-danger"></span>
@@ -17,19 +16,18 @@
             <input asp-for="Password" class="form-control" placeholder="Enter Password" type="password" />
             <span asp-validation-for="Password" class="text-danger"></span>
         </div>
-        
-        
+
         <div class="form-actions">
-<button type="submit" class="btn btn-success">Login</button>
-<p class="text-center mt-3">
-        New User ? Register Here! <a asp-action="Register" asp-controller="User" class="btn btn-success">Register</a>
-</p>
-</div>
-        </form>
+            <button type="submit" class="btn btn-success">Login</button>
+            <p class="text-center mt-3">
+                New User ? Register Here! <a asp-action="Register" asp-controller="User" class="btn btn-success">Register</a>
+            </p>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
-
-
