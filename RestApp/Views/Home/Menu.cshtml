@@ -5,12 +5,32 @@
 @{
     ViewData["Title"] = "Menu Page";
 }
+<style>
+    .btn-light-black {
+        background-color: #f0f0f0;
+        color: #333;
+        border: 1px solid #ccc;
+        transition: all 0.2s ease-in-out;
+    }
+
+        .btn-light-black:hover {
+            background-color: #e0e0e0;
+            color: #000;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-light-black:active {
+            transform: scale(0.98);
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+</style>
+
 @{
     DBServices dbs = new DBServices();
     List<Category> categoryList = dbs.GetAllCategories();
 }
 <div class="text-center">
-    <h1 class="display-4">Welcome to the Queen's Kitchen Menu Bar</h1>
+    <h1 class="display-4">Welcome to Flavour Hub</h1>
 </div>
 
 <div class="row row-cols-1 row-cols-md-3 g-4">
@@ -38,7 +58,11 @@
                 </p>
                 </div>
                 <div class="card-footer">
-                <a href="#" class="card-link">See all</a>
+                <a href="@Url.Action("ByCategory", "FoodItems", new { categoryId = categorytype.CategoryId })"
+                   class="btn btn-light-black btn-sm w-100">
+                    See All Items
+                </a>
+
                 </div>
                 </div>
                 </div>

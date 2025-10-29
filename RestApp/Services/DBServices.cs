@@ -53,6 +53,15 @@ namespace restapp.Services
             }
             return iTypeList;
         }
+        public List<FoodItem> GetFoodItemsByCategory(int categoryId)
+        {
+            return _dbContext.fooditems
+                .Include(f => f.category)
+                .Include(f => f.itemType)
+                .Where(f => f.CategoryId == categoryId)
+                .ToList();
+        }
+
 
     }
 }

@@ -236,6 +236,12 @@ namespace restapp.Controllers
         {
             return _context.FoodItem.Any(e => e.ItemId == id);
         }
+        public IActionResult ByCategory(int categoryId)
+        {
+            var dbs = new DBServices();
+            List<FoodItem> foodItems = dbs.GetFoodItemsByCategory(categoryId);
+            return View(foodItems);
+        }
 
     }
 
