@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using restapp.Dal;
 using restapp.Models;
 using System.Reflection.Metadata.Ecma335;
@@ -19,6 +20,7 @@ namespace restapp.Controllers
         {
             return View();
         }
+
 
         public IActionResult Logout() // removing the user logged in details from the session
         {
@@ -79,8 +81,8 @@ namespace restapp.Controllers
                         else if (r.RoleName == "User")
                         {
                             HttpContext.Session.SetString("loggedinuser", ul.UserId);
-                            HttpContext.Session.SetString("loggedinuserRole", "Employee2");
-                            return RedirectToAction("Index", "Login");
+                            HttpContext.Session.SetString("loggedinuserRole", "User");
+                            return RedirectToAction("Index", "Home");
                         }
                         else
                         {

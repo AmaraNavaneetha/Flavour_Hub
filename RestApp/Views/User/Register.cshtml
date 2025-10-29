@@ -1,10 +1,9 @@
-﻿
-@model restapp.Models.User
+﻿@model restapp.Models.User
 
 @{
     ViewData["Title"] = "Register";
     // NOTE: You are using _LayoutAdmin.cshtml, which might be confusing for a public registration page.
-    Layout = "~/Views/Shared/_Layout.cshtml"; 
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container d-flex justify-content-center align-items-center mt-5" style="min-height: 80vh;">
@@ -67,5 +66,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
