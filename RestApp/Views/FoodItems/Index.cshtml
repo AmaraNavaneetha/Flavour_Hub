@@ -1,8 +1,12 @@
-﻿@model IEnumerable<restapp.Models.FoodItem>
+﻿@using restapp.Dal
+@model PaginatedList<restapp.Models.FoodItem>
 
 @{
+
     ViewData["Title"] = "Index";
+
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+
 }
 
 
@@ -11,120 +15,213 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+<form asp-action="Index" method="get">
+    <div class="form-actions no-color">
+        <p>
+            <label>Find by Name: <input type="text" 
+                                        name="SearchString" 
+                                        value="@ViewData["CurrentFilter"]" /></label>
+            <input type="submit" value="Search" class="btn btn-default" /> |
+            <a asp-action="Index">Back to Full List</a>
+        </p>
+    </div>
+</form>
+
+<form asp-action="Index" asp-controller="FoodItems">
+    <select name="CategoryId"
+            id="CategoryId"
+            class="form-control"
+            asp-items="ViewBag.CategoryId"></select>
+    <input type="submit" value="Select Category" />
+</form>
 <table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ItemName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ItemDescription)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ActualPrice)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DiscountPer)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SellingPrice)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Rating)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RatingCount)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ItemImagePath)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsAvailable)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsBestSeller)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsFastMoving)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsBreakfast)
-            </th>
-             <th>
-                @Html.DisplayNameFor(model => model.IsLunch)
-            </th>
-             <th>
-                @Html.DisplayNameFor(model => model.IsDinner)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.category)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.itemType)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ItemName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ItemDescription)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ActualPrice)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DiscountPer)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SellingPrice)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Rating)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RatingCount)
-            </td>
-            <td>
-                <img src="@Url.Content(item.ItemImagePath)" 
-                alt="@item.ItemName" 
-                width="300" 
-                height="150"/>
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsAvailable)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsBestSeller)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsFastMoving)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsBreakfast)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsLunch)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsDinner)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.category.CategoryName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.itemType.ItemTypeName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ItemId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ItemId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ItemId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr class="bg-info">
+                <th>
+
+                    <a asp-action="Index"
+                       asp-route-sortOrder="@ViewData["NameSortParm"]"
+                       asp-route-currentFilter="@ViewData["CurrentFilter"]">Name</a>
+                </th>
+                <td>
+
+                    @Html.DisplayFor(modelItem => item.ItemName)
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Description
+                </th>
+                <td>
+
+                    @Html.DisplayFor(modelItem => item.ItemDescription)
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    ActualPrice
+                </th>
+                <td>
+
+                    @Html.DisplayFor(modelItem => item.ActualPrice)
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Discount
+                </th>
+                <td>
+
+                    @Html.DisplayFor(modelItem => item.DiscountPer)
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <a asp-action="Index"
+                       asp-route-sortOrder="@ViewData["sellingpriceSortParm"]"
+                       asp-route-currentFilter="@ViewData["CurrentFilter"]">SellingPrice</a>
+                </th>
+                <td>
+
+                    @Html.DisplayFor(modelItem => item.SellingPrice)
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <a asp-action="Index"
+                       asp-route-sortOrder="@ViewData["ratingSortParm"]"
+                       asp-route-currentFilter="@ViewData["CurrentFilter"]">Rating</a>
+                </th>
+                <td>
+
+                    @Html.DisplayFor(modelItem => item.Rating)
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    RatingCount
+                </th>
+                <td>
+
+                    @Html.DisplayFor(modelItem => item.RatingCount)
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    ItemImage
+                </th>
+                <td>
+                    <img src="@Url.Content(item.ItemImagePath)"
+                         alt="@item.ItemName"
+                         width="300"
+                         height="150" />
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    IsAvailable
+                </th>
+                <td>
+
+                    @Html.DisplayFor(modelItem => item.IsAvailable)
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    IsBestSeller
+                </th>
+                <td>
+
+                    @Html.DisplayFor(modelItem => item.IsBestSeller)
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    IsFastMoving
+                </th>
+                <td>
+
+                    @Html.DisplayFor(modelItem => item.IsFastMoving)
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    IsBreakfastItem
+                </th>
+                <td>
+
+                    @Html.DisplayFor(modelItem => item.IsBreakfast)
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    IsLunchItem
+                </th>
+                <td>
+
+                    @Html.DisplayFor(modelItem => item.IsLunch)
+                </td>
+             </tr>
+             <tr>
+                <th>
+                    IsDinnerItem
+                </th>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsDinner)
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    CategoryName
+                </th>
+                <td>
+
+                    @Html.DisplayFor(modelItem => item.category.CategoryName)
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    ItemTypeName
+                </th>
+                <td>
+
+                    @Html.DisplayFor(modelItem => item.itemType.ItemTypeName)
+                </td>
+             </tr>
+             <tr>
+                <th>
+                    Operations
+                </th>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ItemId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.ItemId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.ItemId">Delete</a>
+                </td>
+            </tr>
+
+        }
     </tbody>
 </table>
+<br/>
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>
+
