@@ -38,6 +38,8 @@ namespace restapp.Models
         [MaxLength(50, ErrorMessage = "Invalid size")]
         public string UserId { get; set; }
 
+        
+
         [Required]
         public bool Status { get; set; }
 
