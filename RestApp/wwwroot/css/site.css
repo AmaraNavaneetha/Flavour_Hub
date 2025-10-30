@@ -111,6 +111,122 @@ body {
     }
 
 
+/* Add this new rule to your stylesheet */
+.container {
+    flex-grow: 1; /* Allows the main content area to expand and push the footer down */
+}
+
+/* Ensure the footer is the final element */
+.footer {
+    flex-shrink: 0; /* Prevents the footer from shrinking */
+    width: 100%;
+    /* You may need to remove any fixed height/positioning from the footer in your shared layout */
+}
+
+/* Existing .btn-success styles */
+.btn-success {
+    border-radius: 20px;
+    padding: 8px 10px; /* This is already a reasonable size, but we'll refine for the login page */
+    /* ... existing styles ... */
+}
+
+/* Remove or modify this if it's making your buttons too large globally */
+/* @media (min-width: 768px) {
+     .btn-lg {
+        padding: .5rem 1rem; // Example default smaller override if it's too big
+        font-size: 1rem;
+        border-radius: .3rem;
+    }
+} */
+
+
+/* Wrapper for centering the now-smaller buttons */
+.login-button-wrapper {
+    display: flex;
+    justify-content: center; /* Center the button horizontally */
+    margin-bottom: 15px; /* Add some space below the button */
+}
+
+    /* Target and size the buttons themselves */
+    .login-button-wrapper .interactive-btn {
+        /* Define a fixed, smaller width */
+        width: 150px; /* Adjust this value (e.g., 120px, 180px) to control the width */
+        /* Ensure only padding dictates the height (removed fixed height) */
+        padding: 10px 20px;
+        font-size: 1rem;
+        /* Overwrite any full-width defaults */
+        display: inline-block;
+        /* Maintain other button styles */
+        border-radius: 25px;
+        font-weight: bold;
+        text-transform: uppercase;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    /* Ensure the main login button has a bottom margin */
+    .login-button-wrapper:first-of-type {
+        margin-bottom: 15px; /* Space between the login button and the 'New User' text */
+    }
+
+/* --- Other Login Page Styling (from previous response, ensure these are present) --- */
+
+.login-container {
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.5s ease-out;
+}
+
+.login-title {
+    color: #00008B;
+    font-weight: 600;
+}
+
+.login-input-group .form-control {
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .login-input-group .form-control:focus {
+        border-color: #00008B;
+        box-shadow: 0 0 0 0.2rem rgba(0, 0, 139, 0.25);
+    }
+
+.interactive-btn {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+    .interactive-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .interactive-btn:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+.register-prompt {
+    font-size: 0.95rem;
+    color: #333;
+    margin-bottom: 5px !important;
+    text-align: center; /* Ensure text remains centered */
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Ensure the main card is the positioning context for its children */
 .food-item-card {
     position: relative;
