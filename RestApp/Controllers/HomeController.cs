@@ -40,39 +40,6 @@ namespace restapp.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-        // 💡 NEW ACTION TO HANDLE USER SEARCH REQUESTS
-        public async Task<IActionResult> SearchResults(string searchString)
-        {
-            // Store the search string to pre-fill the search bar (optional but good UX)
-            ViewData["CurrentFilter"] = searchString;
-
-            // Start with all available food items, including Category and ItemType details
-            var foodItemsQuery = _context.fooditems
-                                    .Include(f => f.category)
-                                    .Include(f => f.itemType)
-                                    .AsQueryable();
-
-            // Apply the search filter if a search string is provided
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                // Convert search string to lower case once for case-insensitive comparison
-                string lowerSearch = searchString.ToLower();
-
-                // Filter items where the name OR the category name contains the search term
-                foodItemsQuery = foodItemsQuery.Where(f =>
-                    f.ItemName.ToLower().Contains(lowerSearch) ||
-                    (f.category != null && f.category.CategoryName.ToLower().Contains(lowerSearch))
-                );
-            }
-
-            // Execute the query and return the list of items
-            List<FoodItem> searchResults = await foodItemsQuery
-                                            // Optional: Order the results for consistency
-                                            .OrderBy(f => f.ItemName)
-                                            .ToListAsync();
-
-            // Determine which view to return. The bycategory view should work well for displaying items.
-            return View("ByCategory", searchResults);
-        }
+        
     }
 }
