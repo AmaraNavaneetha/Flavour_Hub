@@ -111,6 +111,51 @@ body {
         font-weight: 600;
     }
 
+/* Custom styles for Admin Dashboard cards */
+.dashboard-card {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    border-radius: 0.5rem; /* Slightly rounded corners */
+}
+
+    /* Hover effect for all dashboard cards */
+    .dashboard-card:hover {
+        transform: translateY(-5px); /* Lift the card slightly */
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2) !important; /* Stronger shadow on hover */
+        cursor: pointer;
+    }
+
+/* Custom background colors */
+.bg-categories {
+    background-color: #38c172 !important;
+}
+/* Green */
+.bg-fooditems {
+    background-color: #3490dc !important;
+}
+/* Blue */
+.bg-users {
+    background-color: #ffed4a !important;
+}
+/* Yellow */
+.bg-orders {
+    background-color: #e3342f !important;
+}
+/* Red */
+.bg-revenue {
+    background-color: #f6993f !important;
+}
+/* Orange */
+
+/* Text color for custom backgrounds to ensure readability */
+.bg-categories, .bg-fooditems, .bg-orders {
+    color: white !important;
+}
+
+.bg-users, .bg-revenue {
+    color: #333 !important;
+}
+/* Darker text for light backgrounds */
+
 
 /* Add this new rule to your stylesheet */
 .container {

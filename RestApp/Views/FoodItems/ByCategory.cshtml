@@ -35,9 +35,9 @@
                                         <span class="text-success fw-semibold"></span>
                                     </span>
                                 }
+                                @* 🟥 Non-Veg Indicator Logic *@
                                 else
                                 {
-                                    @* Non-Veg Indicator *@
                                     <span class="d-inline-flex align-items-center gap-2">
                                         <span class="d-inline-block bg-white border border-danger rounded px-1 py-1" style="width: 20px; height: 20px; position: relative; overflow: hidden;">
                                             <svg viewBox="0 0 20 20" width="20" height="20" style="position: absolute; top: 0; left: 0;">
@@ -75,10 +75,14 @@
                                 <span class="text-success">@item.DiscountPer% off</span>
                             </p>
 
-                            @* Selling Price and Add Button Side by Side *@
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="fw-bold fs-5 mb-0">₹@item.SellingPrice</span>
-                                <button class="btn btn-success btn-sm">Add</button>
+
+                                @* FIX: Pass ItemId and the JSON-serialized ItemName *@
+                                <button class="btn btn-success btn-sm"
+                                        onclick="addToCart('@item.ItemId', @itemNameJson)">
+                                    Add
+                                </button>
                             </div>
                         </div>
                     </div>

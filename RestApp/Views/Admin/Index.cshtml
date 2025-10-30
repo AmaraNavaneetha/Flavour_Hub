@@ -1,8 +1,80 @@
-﻿
-@{
-    ViewData["Title"] = "Index";
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 
-<h1>Welcome to Admin</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="display-4">Dashboard Overview</h1>
+    <span class="badge bg-secondary p-2">Logged in as: @ViewBag.loggedInUserId</span>
+</div>
+<hr />
 
+<div class="row">
+
+    @* Card 1: Total Categories (Green) *@
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-sm text-center dashboard-card bg-categories">
+            <div class="card-body">
+                <i class="bi bi-tag-fill display-4 mb-3"></i>
+                <h5 class="card-title text-uppercase mb-2">Total Categories</h5>
+                <p class="h1 mb-0">@ViewBag.TotalCategories</p>
+                @* **CHANGED TO BUTTON** *@
+                <a asp-controller="Categories" asp-action="Index" class="btn btn-sm btn-light mt-3 d-block">Manage Categories &raquo;</a>
+            </div>
+        </div>
+    </div>
+
+    @* Card 2: Total Food Items (Blue) *@
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-sm text-center dashboard-card bg-fooditems">
+            <div class="card-body">
+                <i class="bi bi-box-seam display-4 mb-3"></i>
+                <h5 class="card-title text-uppercase mb-2">Total Food Items</h5>
+                <p class="h1 mb-0">@ViewBag.TotalFoodItems</p>
+                @* **CHANGED TO BUTTON** *@
+                <a asp-controller="FoodItems" asp-action="Index" class="btn btn-sm btn-light mt-3 d-block">Manage Items &raquo;</a>
+            </div>
+        </div>
+    </div>
+
+    @* Card 3: Total Users (Yellow/Dark Text) *@
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-sm text-center dashboard-card bg-users">
+            <div class="card-body">
+                <i class="bi bi-people-fill display-4 mb-3"></i>
+                <h5 class="card-title text-uppercase mb-2">Registered Users</h5>
+                <p class="h1 mb-0">@ViewBag.TotalUsers</p>
+                @* **CHANGED TO BUTTON** *@
+                <a asp-controller="UserManager" asp-action="Index" class="btn btn-sm btn-light mt-3 d-block">Manage Users &raquo;</a>
+            </div>
+        </div>
+    </div>
+
+    @* Card 4: Total Orders (Red) *@
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-sm text-center dashboard-card bg-orders">
+            <div class="card-body">
+                <i class="bi bi-cart-check-fill display-4 mb-3"></i>
+                <h5 class="card-title text-uppercase mb-2">Total Orders</h5>
+                <p class="h1 mb-0">@ViewBag.TotalOrders</p>
+                @* **CHANGED TO BUTTON** *@
+                <a asp-controller="Orders" asp-action="Index" class="btn btn-sm btn-light mt-3 d-block">Manage Orders &raquo;</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    @* Card 5: Revenue Summary (Orange/Dark Text) *@
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-sm text-center dashboard-card bg-revenue">
+            <div class="card-body">
+                <i class="bi bi-currency-dollar display-4 mb-3"></i>
+                <h5 class="card-title text-uppercase mb-2">Revenue Summary</h5>
+                <p class="h1 mb-0">@ViewBag.TotalRevenue</p>
+                @* **CHANGED TO BUTTON** *@
+                <a href="#" class="btn btn-sm btn-light mt-3 d-block">View Reports &raquo;</a>
+            </div>
+        </div>
+    </div>
+</div>
