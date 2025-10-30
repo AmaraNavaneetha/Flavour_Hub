@@ -152,5 +152,100 @@ namespace restapp.Controllers
                 return View("Register", u);
             }
         }
+        // Inside UserController.cs
+
+        // Action to display the user's profile and pre-fill the edit form.
+        public IActionResult Profile()
+        {
+            // 1. Authorization Check (already added in UserMenu, but good practice here too)
+            string? loggedInUserId = HttpContext.Session.GetString("loggedinuser");
+            if (loggedInUserId == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+
+            // 2. Fetch User Data
+            // Fetch the full User object from the database using the UserId stored in the session.
+            User? user = _context.users.FirstOrDefault(u => u.UserId.ToLower() == loggedInUserId.ToLower());
+
+            if (user == null)
+            {
+                // Handle case where session is set but user doesn't exist (e.g., deleted by admin)
+                HttpContext.Session.Remove("loggedinuser");
+                HttpContext.Session.Remove("loggedinuserRole");
+                return RedirectToAction("Login", "User");
+            }
+
+            // 3. Pass the user object to the View
+            return View(user);
+        }
+
+        // Action to handle the form submission when the user clicks 'Save Changes'.
+        [HttpPost]
+        public IActionResult Profile(User updatedUser) // The form binds to the User model
+        {
+            // 1. Authorization Check
+            string? loggedInUserId = HttpContext.Session.GetString("loggedinuser");
+            if (loggedInUserId == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+
+            // Ensure the submitted ID matches the logged-in user's ID
+            if (updatedUser.UserId.ToLower() != loggedInUserId.ToLower())
+            {
+                // Security check: prevent editing another user's profile
+                return Forbid();
+            }
+
+            // 2. Model Validation
+            // Remove RoleId and Status from validation, as they are often handled server-side or not part of the form.
+            ModelState.Remove("RoleId");
+            ModelState.Remove("Status");
+
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Please correct the errors in the form.";
+                return View(updatedUser); // Return with validation errors
+            }
+
+            try
+            {
+                // 3. Fetch the original user record from the database
+                User? originalUser = _context.users.Find(updatedUser.Id); // Assuming 'Id' is the primary key. If not, use FirstOrDefault.
+
+                if (originalUser == null)
+                {
+                    TempData["ErrorMessage"] = "User not found.";
+                    return RedirectToAction("Logout", "User");
+                }
+
+                // 4. Update ONLY the editable properties
+                originalUser.FirstName = updatedUser.FirstName;
+                originalUser.LastName = updatedUser.LastName;
+                // originalUser.UserId is generally not editable
+                originalUser.Mobile = updatedUser.Mobile;
+                originalUser.Email = updatedUser.Email;
+
+                // Only update password if the user entered a new one (requires a change in the model/view)
+                if (!string.IsNullOrEmpty(updatedUser.Password))
+                {
+                    originalUser.Password = updatedUser.Password;
+                }
+
+                // 5. Save Changes
+                _context.users.Update(originalUser);
+                _context.SaveChanges();
+
+                TempData["SuccessMessage"] = "Your profile has been updated successfully!";
+                return RedirectToAction("Profile");
+            }
+            catch (Exception ex)
+            {
+                // Log the error
+                TempData["ErrorMessage"] = "An unexpected error occurred while saving your details.";
+                return View(updatedUser);
+            }
+        }
     }
 }
