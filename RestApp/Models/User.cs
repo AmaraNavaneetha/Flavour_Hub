@@ -43,6 +43,8 @@ namespace restapp.Models
         [Required]
         public bool Status { get; set; }
 
+        
+
         //foreign key
         public int RoleId { get; set; }
 

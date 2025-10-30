@@ -18,6 +18,8 @@ namespace restapp.Dal
             modelBuilder.Entity<Category>().ToTable("Category");
             modelBuilder.Entity<FoodItem>().ToTable("FoodItem");
             modelBuilder.Entity<ItemType>().ToTable("ItemType");
+            // Tell EF Core to completely ignore the CartItem class
+            modelBuilder.Ignore<CartItem>();
 
         }
         public DbSet<Role> roles { get; set; }
@@ -26,6 +28,9 @@ namespace restapp.Dal
         public DbSet<Category> categories { get; set; }
         public DbSet<ItemType> itemTypes { get; set; }
         public DbSet<FoodItem> fooditems { get; set; }
+        
+        public DbSet<CartItem> Carts { get; set; }
+        
 
         public DbSet<restapp.Models.UserLogin> UserLogin { get; set; } = default!;
         public DbSet<restapp.Models.FoodItem> FoodItem { get; set; } = default!;

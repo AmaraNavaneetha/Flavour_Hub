@@ -1,11 +1,18 @@
 ﻿@using restapp.Services
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+@using restapp.Models @* Reference the Models namespace *@
+@* At the very top of your .cshtml file (e.g., Menu.cshtml or _Layout.cshtml) *@
+@inject restapp.Services.DBServices dbs
+@{
+    // REMOVE THE LINE: DBServices dbs = new DBServices();
+
+    // Now, 'dbs' is already injected and ready to use!
+    List<Category> categoryList = dbs.GetAllCategories();
+}
 @{
     ViewData["Title"] = "Menu Page";
 }
 <style>
+    /* Your existing styles */
     .btn-light-black {
         background-color: #f0f0f0;
         color: #333;
@@ -23,12 +30,26 @@
             transform: scale(0.98);
             box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
         }
+
+    /* ADDED: Styles for Disabled Category */
+    .disabled-card {
+        background-color: #f7f7f7;
+        opacity: 0.6; /* Dim the card visually */
+        pointer-events: none; /* ESSENTIAL: Prevents all clicks inside the card */
+        cursor: not-allowed;
+    }
+
+    .disabled-image {
+        filter: grayscale(100%); /* Make image black and white */
+    }
+
+    .unavailable-text {
+        color: #dc3545 !important; /* Red text for warning */
+        font-weight: bold;
+    }
 </style>
 
-@{
-    DBServices dbs = new DBServices();
-    List<Category> categoryList = dbs.GetAllCategories();
-}
+
 <div class="text-center">
     <h1 class="display-4">Welcome to Flavour Hub</h1>
 </div>
@@ -36,36 +57,53 @@
 <div class="row row-cols-1 row-cols-md-3 g-4">
 
     @foreach (Category categorytype in categoryList)
-
     {
-                <div class="col">
-                <div class="card h-100">
+        // 1. CHECK STATUS AND DEFINE CLASSES
+        bool isDisabled = !categorytype.CategoryStatus;
+        string cardClass = "card h-100 " + (isDisabled ? "disabled-card" : "shadow");
+
+        <div class="col">
+            <div class="@cardClass">
+
                 <img src="@Url.Content(categorytype.CategoryImagePath)"
+                     class="card-img-top img-fluid @(isDisabled ? "disabled-image" : "")" @* Apply grayscale if disabled *@
+                     alt="@categorytype.CategoryName"
+                     style="height :200px; object-fit:cover;" />
 
-                                     class="card-img-top img-fluid"
-
-                                     alt="@categorytype.CategoryName"
-                                     style="height :200px; object-fit:cover;"/>
                 <div class="card-body">
-                <h5 class="card-title">@categorytype.CategoryName</h5>
+                    <h5 class="card-title">@categorytype.CategoryName</h5>
+
+                    @* Display "Unavailable" message if disabled *@
+                    @if (isDisabled)
+                    {
+                        <p class="unavailable-text">UNAVAILABLE</p>
+                    }
+
                 <p class="card-text">
-
-                                        @(categorytype.CategoryDescription.Length > 50
-
-                                                            ? categorytype.CategoryDescription.Substring(0, 50) + "..."
-
-                                                            : categorytype.CategoryDescription)
+                    @(categorytype.CategoryDescription.Length > 50
+                                        ? categorytype.CategoryDescription.Substring(0, 50) + "..."
+                                        : categorytype.CategoryDescription)
                 </p>
-                </div>
+            </div>
+
                 <div class="card-footer">
-                <a href="@Url.Action("ByCategory", "FoodItems", new { categoryId = categorytype.CategoryId })"
-                   class="btn btn-light-black btn-sm w-100">
-                    See All Items
-                </a>
-
+                @if (!isDisabled)
+                    {
+                        // 2. ACTIVE: Show the clickable link
+                        <a href="@Url.Action("ByCategory", "FoodItems", new { categoryId = categorytype.CategoryId })"
+                           class="btn btn-light-black btn-sm w-100">
+                            See All Items
+                        </a>
+                    }
+                    else
+                    {
+                        // 3. INACTIVE: Show a non-clickable, disabled button
+                        <button class="btn btn-secondary btn-sm w-100" disabled>
+                            Currently Unavailable
+                        </button>
+                    }
                 </div>
-                </div>
-                </div>
-
-        }
+            </div>
+        </div>
+    }
 </div>

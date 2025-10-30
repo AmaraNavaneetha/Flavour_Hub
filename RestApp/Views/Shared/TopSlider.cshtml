@@ -10,9 +10,14 @@
 
 @* this is called razor code *@
 
-@{
-    DBServices dbs = new DBServices();
+@* 1. Add the @inject directive at the top of the view/layout *@
+@inject restapp.Services.DBServices dbs
 
+@{
+    // 2. Remove the manual instantiation, as 'dbs' is now provided by @inject
+    // DBServices dbs = new DBServices();
+
+    // 3. Now you can use the injected 'dbs' object directly:
     List<Sliders> sliders = dbs.GetAllSliders();
 }
 
