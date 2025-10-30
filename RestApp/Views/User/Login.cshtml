@@ -5,24 +5,39 @@
 }
 <hr />
 
-<div class="container mt-5" style="max-width: 400px;">
-    <form asp-action="ValidateUser">
-        <h2 class="text-center mb-4">Login</h2>
-        <div class="form-group mb-3">
+<div class="container mt-5 login-container" style="max-width: 400px;">
+    
+    <form asp-action="ValidateUser" method="post" class="login-form-card">
+        <h2 class="text-center mb-4 login-title">Login</h2>
+
+        @* Validation Summary *@
+        <div class="mb-3">
+            <div asp-validation-summary="ModelOnly" class="text-danger validation-message"></div>
+        </div>
+        
+        <div class="form-group mb-3 login-input-group">
             <input asp-for="UserId" class="form-control" placeholder="Enter Username" />
             <span asp-validation-for="UserId" class="text-danger"></span>
         </div>
-        <div class="form-group mb-3">
+        <div class="form-group mb-3 login-input-group">
             <input asp-for="Password" class="form-control" placeholder="Enter Password" type="password" />
             <span asp-validation-for="Password" class="text-danger"></span>
         </div>
 
-        <div class="form-actions">
-            <button type="submit" class="btn btn-success">Login</button>
-            <p class="text-center mt-3">
-                New User ? Register Here! <a asp-action="Register" asp-controller="User" class="btn btn-success">Register</a>
-            </p>
+        @* --- MODIFIED: Removed d-grid, added button-wrapper for centering --- *@
+        <div class="form-actions login-button-wrapper mt-4">
+            <button type="submit" class="btn btn-success login-button interactive-btn">LOGIN</button>
         </div>
+        
+        <p class="text-center mt-4 register-prompt">
+            New User ? Register Here!
+        </p>
+        
+        <div class="form-actions login-button-wrapper">
+            <a asp-action="Register" asp-controller="User" class="btn btn-success register-button interactive-btn">REGISTER</a>
+        </div>
+        @* ------------------------------------------------------------------- *@
+        
     </form>
 </div>
 
