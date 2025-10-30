@@ -71,14 +71,6 @@ body {
     top: 0;
     z-index: 1000;
 }
-.footer {
-    background: radial-gradient(circle,rgba(240, 231, 153, 1) 0%, rgba(240, 240, 230, 1) 100%);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    padding: 12px 20px;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
 
 .navbar-brand {
     font-size: 1.8rem;
