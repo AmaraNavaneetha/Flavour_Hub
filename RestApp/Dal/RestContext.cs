@@ -27,7 +27,7 @@ namespace restapp.Dal
         public DbSet<ItemType> itemTypes { get; set; }
         public DbSet<FoodItem> fooditems { get; set; }
         
-        public DbSet<Cart> Carts { get; set; }
+        
         
 
         public DbSet<restapp.Models.UserLogin> UserLogin { get; set; } = default!;

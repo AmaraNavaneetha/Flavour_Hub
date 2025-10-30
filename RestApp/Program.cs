@@ -1,5 +1,6 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using restapp.Dal;
+using restapp.Services; // 👈 Add this using directive
 
 namespace restapp
 {
@@ -11,6 +12,7 @@ namespace restapp
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
             //added - to create or use sessions we added this
             builder.Services.AddSession();
 
@@ -19,16 +21,23 @@ namespace restapp
             string conStr = builder.Configuration.GetConnectionString("SQLServerConnection");
             builder.Services.AddDbContext<RestContext>(options => options.UseSqlServer(conStr));
 
+            // ⭐ CRITICAL FIX: Register DBServices
+            // AddScoped is appropriate for services that rely on DbContext (which is also Scoped).
+            builder.Services.AddScoped<DBServices>();
+
             var app = builder.Build();
+
             //added
             app.UseSession();
+
+            app.UseStaticFiles();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-            app.UseStaticFiles();
+            
 
             app.UseRouting();
 

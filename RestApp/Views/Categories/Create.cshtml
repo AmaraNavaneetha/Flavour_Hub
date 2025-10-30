@@ -12,7 +12,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create" enctype="multipart/form-data"">
+        <form asp-action="Create" enctype="multipart/form-data" ">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="CategoryName" class="control-label"></label>
@@ -28,18 +28,18 @@
 
             <div class="form-group">
                 <label class="control-label"> Selected Category Image </label>
-                <img id="CategoryImagePreview" 
-                    class="form-control" 
-                    width="600" 
-                    height ="150"/>
+                <img id="CategoryImagePreview"
+                     class="form-control"
+                     width="600"
+                     height="150" />
             </div>
 
-           <div class="form-group">
+            <div class="form-group">
                 <label class="control-label">Select Category Image</label>
-                <input type="file" 
-                    name="CategoryImage" 
-                    class="form-control" 
-                    onchange="DisplayImage(event)"/>
+                <input type="file"
+                       name="CategoryImage"
+                       class="form-control"
+                       onchange="DisplayImage(event)" />
                 <span asp-validation-for="CategoryImage" class="text-danger"></span>
             </div>
 
@@ -64,12 +64,12 @@
     var DisplayImage = function(event)
     {
         //the file which is selected by type="file" then it is given as input type"event" to the function
-        //target is an object which refers to the image that is selected 
+        //target is an object which refers to the image that is selected
         console.log(event.target.value);
         var previewImage = document.getElementById("CategoryImagePreview");
         console.log(event.target.files[0]);
         previewImage.src = URL.createObjectURL(event.target.files[0]);
-        
+
     }
 </script>
 
