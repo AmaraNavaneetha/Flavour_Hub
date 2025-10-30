@@ -275,86 +275,72 @@ body {
     }
 }
 
-/* Ensure the main card is the positioning context for its children */
+/* Food Item Card Base Style */
 .food-item-card {
     position: relative;
-    overflow: hidden; /* CRITICAL: Hide the tooltip content initially */
+    overflow: hidden;
     z-index: 1;
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, z-index 0.1s;
-    cursor: pointer; /* Indicate it's interactive */
+    /* Remove 'transform' and 'transition' from base card */
+    transition: box-shadow 0.3s ease-in-out, z-index 0.1s;
+    cursor: default; /* Reset cursor */
 }
 
-/* Tooltip container - Hidden by default and ready to cover the card */
+/* Style for the clickable image to show it's interactive */
+.card-image-clickable {
+    cursor: pointer; /* Pointer only on the image */
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Style for the card when the tooltip is active (optional scale effect on click) */
+.food-item-card.tooltip-active {
+    z-index: 5; /* Bring the active card to the front */
+    transform: scale(1.05); /* Slight zoom out effect on the entire card */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.35); /* Stronger shadow */
+}
+
+
+/* Tooltip container - Hidden by default */
 .full-description-tooltip {
-    /* 1. POSITIONING: Cover the entire card area */
+    /* POSITIONING: Centered within the card */
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /* 2. APPEARANCE */
-    background-color: #fff; /* White background to cover existing content */
-    padding: 1rem;
-    border-radius: 0.25rem; /* Match card border-radius */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Enhanced shadow for pop effect */
-    /* 3. HIDING/ANIMATION: Start completely transparent and slightly scaled down */
+    top: 50%;
+    left: 50%;
+    width: 90%;
+    max-height: 90%;
+    /* HIDING/ANIMATION: Start completely transparent, scaled down, and translated to center */
     opacity: 0;
     visibility: hidden;
-    transform: scale(0.8); /* Start smaller */
+    transform: translate(-50%, -50%) scale(0.8);
     transition: opacity 0.3s ease-out, visibility 0.3s ease-out, transform 0.3s ease-out;
-    z-index: 10; /* Appears above card-body */
+    z-index: 10;
     pointer-events: none; /* Prevents blocking clicks when hidden */
-    /* Content Layout - Adjusted for a cleaner vertical stack */
+    /* The rest of the styling (background, padding, flex layout, etc.) remains the same from the previous compact version */
+    background-color: #fff;
+    padding: 0.8rem;
+    border-radius: 0.25rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Align content to top */
+    justify-content: flex-start;
     align-items: center;
     text-align: center;
 }
 
-    /* No `::after` pointer needed for this effect, as it's covering the card. */
-
-    /* Specific elements within the tooltip */
-    .full-description-tooltip .tooltip-img {
-        height: 40%; /* Take up a percentage of the tooltip height */
-        width: 100%;
-        object-fit: cover;
-        margin-bottom: 0.75rem;
-        border-radius: 0.25rem;
-    }
-
-    .full-description-tooltip .tooltip-name {
-        font-size: 1.1rem;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 0.5rem;
-    }
-
-    .full-description-tooltip .tooltip-description {
-        font-size: 0.9rem;
-        line-height: 1.4;
-        text-align: center; /* Center the description text */
-        overflow-y: auto; /* Allow scrolling if description is too long */
-        flex-grow: 1; /* Allow it to take remaining vertical space */
-    }
-
-
-/* --- C. Hover Effect --- */
-
-.food-item-card:hover {
-    z-index: 5; /* Bring the active card to the front */
-    transform: scale(1.05); /* Zoom out the entire card slightly */
-    box-shadow: 0 10px 25px rgba(0,0,0,0.35); /* Stronger shadow for the popped-out effect */
+/* --- CLICK/ACTIVE EFFECT --- */
+/* Show and animate the tooltip when the parent card has the 'tooltip-active' class */
+.food-item-card.tooltip-active .full-description-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1); /* Zoom to full size */
+    pointer-events: auto; /* Re-enable interaction on the tooltip content */
 }
 
-    .food-item-card:hover .full-description-tooltip {
-        /* SHOW THE TOOLTIP: Cover the card content with a zoom-in effect */
-        opacity: 1;
-        visibility: visible;
-        transform: scale(1); /* Zoom to full size */
-        pointer-events: auto; /* Re-enable interaction on the tooltip content */
-    }
-
+/* Hide the original content when the tooltip is active */
+.food-item-card.tooltip-active .card-body,
+.food-item-card.tooltip-active .card-img-top {
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+}
     /* Optionally, hide the original card-body content to reveal the tooltip more cleanly */
     .food-item-card:hover .card-body,
     .food-item-card:hover .card-img-top {

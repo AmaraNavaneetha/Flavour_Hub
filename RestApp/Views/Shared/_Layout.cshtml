@@ -10,42 +10,60 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 </head>
 @{
-        var isHomePage = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "Home", StringComparison.OrdinalIgnoreCase)
+        var isHomePage = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "Home", StringComparison.OrdinalIgnoreCase)
 && string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Index", StringComparison.OrdinalIgnoreCase);
-        var loggedInUser = Context.Session.GetString("loggedinuser");
-        var loggedInRole = Context.Session.GetString("loggedinuserRole");
+        var loggedInUser = Context.Session.GetString("loggedinuser");
+        var loggedInRole = Context.Session.GetString("loggedinuserRole");
 }
 <body>
 <header>
-<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow mb-3"> @* Changed to navbar-expand-lg for better search visibility *@
 <div class="container-fluid">
 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Flavour Hub</a>
-<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 <span class="navbar-toggler-icon"></span>
 </button>
-<div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-<ul class="navbar-nav flex-grow-1">
+<div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+<ul class="navbar-nav me-auto mb-2 mb-lg-0"> @* Added me-auto for left alignment, mb-2/mb-lg-0 for mobile/desktop spacing *@
 <li class="nav-item">
 <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
 </li>
-<div class="navbar-collapse collapse d-sm-inline-flex">
-<ul class="navbar-nav">
 <li class="nav-item">
 <a class="nav-link text-dark" asp-controller="Home" asp-action="Menu">Menu</a>
 </li>
 </ul>
- 
-    <ul class="navbar-nav ms-auto"> 
-        @if (loggedInUser == null)
-        {
+
+@* -------------------------------------------------------------------------------------- *@
+@* NEW SEARCH BAR IMPLEMENTATION (Form submits to FoodItemsController's Index action) *@
+@* -------------------------------------------------------------------------------------- *@
+<form asp-controller="FoodItems" asp-action="Index" method="get" class="d-flex mx-3">
+    <form asp-controller="Home" asp-action="SearchResults" method="get" class="d-flex mx-3">
+    <input class="form-control me-2" 
+           type="search" 
+           placeholder="Search Food Items" 
+           aria-label="Search" 
+           name="SearchString" 
+           value="@ViewData["CurrentFilter"]">
+    
+    <button class="btn btn-outline-success" type="submit">
+        <i class="fas fa-search"></i> 
+    </button>
+</form>
+</form>
+@* -------------------------------------------------------------------------------------- *@
+
+<ul class="navbar-nav"> @* This keeps the right-aligned user links *@
+    @if (loggedInUser == null)
+    {
 <li class="nav-item">
 <a class="nav-link text-dark" asp-controller="User" asp-action="Login">Login</a>
 </li>
-            }
- 
-        else if (loggedInRole == "User")
-        {
+        }
+ 
+    else if (loggedInRole == "User")
+    {
 <li class="nav-item">
 <a class="nav-link text-dark" asp-controller="User" asp-action="Profile">Profile</a>
 </li>
@@ -56,23 +74,20 @@
 <li class="nav-item">
 <a class="nav-link text-dark" asp-controller="User" asp-action="Logout">Logout</a>
 </li>
-        }
- 
-    </ul>
-</div>
-</ul>
-</div>
-</div>
+        }
+ 
+    </ul>
+</div> @* End of navbar-collapse *@
+</div> @* End of container-fluid *@
 </nav>
 </header>
-    @if (isHomePage)
-    {
+    @if (isHomePage)
+    {
 <partial name="TopSlider" />
-    }
-    @* <partial name="TopSlider" /> *@
+    }
 <div class="container">
 <main role="main" class="pb-3">
-            @RenderBody()
+            @RenderBody()
 </main>
 </div>
 <footer class="border-top footer text-muted">
@@ -83,6 +98,6 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
