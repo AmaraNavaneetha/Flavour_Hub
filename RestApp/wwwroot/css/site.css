@@ -73,7 +73,7 @@ body {
 
 /* Modern Navbar Styling */
 .navbar {
-    background: radial-gradient(circle,rgba(207, 66, 66, 1) 0%, rgba(112, 17, 10, 1) 100%);
+    background: #ED9B68 !important; /* NEW SOLID COLOR BACKGROUND */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     padding: 12px 20px;
     position: sticky;
@@ -87,26 +87,29 @@ body {
 nav.navbar .navbar-brand {
     color: #FFFFFF !important; /* White color for "Flavour Hub" */
     font-weight: 700;
-    color: #CF7342 !important;
+    font-size: 1.5rem;
 }
 
 nav.navbar .navbar-nav .nav-link {
-    color: #FFFFFF !important; /* White text for "Home", "Menu", "Login", etc. */
+    color: #333333 !important; /* White text for "Home", "Menu", "Login", etc. */
     transition: color 0.3s ease;
+    
+    /* --- ADDED: Increase size for navigation links --- */
+    font-size: 1.1rem; /* Starting suggestion: 1.1rem (around 17.6px). Adjust as needed. */
 }
 
     nav.navbar .navbar-nav .nav-link:hover {
-        color: #ADD8E6 !important; /* Light blue on hover */
+        color: #FFFFFF !important; /* Light blue on hover */
     }
 
     /* Ensure icons (like the shopping cart) are white */
     nav.navbar .navbar-nav .nav-link i.fas {
-        color: #FFFFFF !important;
+        color: #000080 !important;
     }
 
 /* Ensure the hover underline uses the contrasting light color */
 nav.navbar .nav-link::after {
-    background-color: #ADD8E6; /* Light blue underline */
+    background-color: #000080; /* Light blue underline */
 }
 
 /* ----------------------------------------------------------- */
@@ -124,14 +127,14 @@ nav.navbar .nav-link::after {
 /* Force background color */
 nav.navbar.bg-dark-blue,
 footer.bg-dark-blue {
-    background-color: #000080 !important; /* Navy Blue */
+    background-color: #ED9B68 !important; /* Navy Blue */
     background-image: none !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
     /* Style the links inside the dark blue footer */
     footer.bg-dark-blue a {
-        color: #ADD8E6 !important; /* Light blue for visibility */
+        color: #FFFFFF !important; /* Light blue for visibility */
         text-decoration: none;
         transition: color 0.3s ease;
     }

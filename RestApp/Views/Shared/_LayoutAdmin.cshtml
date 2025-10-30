@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Flavour Hub</title>
+   
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/restapp.styles.css" asp-append-version="true" />
@@ -11,48 +11,58 @@
 </head>
 <body>
     <header>
-        @* Increased breakpoint to 'lg' for better spacing on larger screens before collapsing *@
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark-blue border-bottom box-shadow mb-3">
-            @* Changed to 'container' for fixed width, or 'container-fluid' if you prefer full width but want padding *@
-            <div class="container"> 
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Flavour Hub</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbarContent"
-                        aria-controls="adminNavbarContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                @* Changed target ID to avoid conflicts, and removed d-sm-inline-flex and justify-content-between *@
-                <div class="collapse navbar-collapse" id="adminNavbarContent">
-                    @* Added 'me-auto' to push the logout link to the right **************
-                       And fixed the nested <ul>. You had an extra <ul> inside another.
-                    *******************************************************************@
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0"> 
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Index">Admin Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="UserManager" asp-action="Index">User Management</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Sliders" asp-action="Index">Sliders</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Categories" asp-action="Index">Categories</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="FoodItems" asp-action="Index">FoodItems</a>
-                        </li>
-                    </ul>
+    @* Using navbar-expand-lg for better spacing on admin dashboard before collapsing *@
+    <nav class="navbar navbar-expand-lg navbar-light border-bottom box-shadow mb-3">
+        
+        @* Use ONE main container to wrap the entire nav content *@
+        <div class="container-fluid"> 
+            
+            @* COMBINED BRAND AND LOGO: Everything in one anchor tag *@
+            <a class="navbar-brand" asp-area="" asp-controller="Admin" asp-action="Index">
+                @* Logo image (Adjust the path if needed) *@
+                <img src="~/images/Logo/logo.png" alt="Flavour Hub Logo" style="height: 35px; margin-right: 10px; vertical-align: middle;" />
+                Flavour Hub
+            </a>
+            
+            @* Toggler button for mobile view *@
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbarContent"
+                    aria-controls="adminNavbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            @* Navigation links container *@
+            <div class="collapse navbar-collapse" id="adminNavbarContent">
+                
+                @* Links on the LEFT/Center: Added 'me-auto' to push the next list (Logout) to the right *@
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">    
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Index">Admin Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="UserManager" asp-action="Index">User Management</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Sliders" asp-action="Index">Sliders</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Categories" asp-action="Index">Categories</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="FoodItems" asp-action="Index">FoodItems</a>
+                    </li>
+                </ul>
 
-                    @* This <ul> will now be pushed to the right because of 'me-auto' on the previous <ul> *@
-                    <ul class="navbar-nav mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="User" asp-action="Logout">Logout</a>
-                        </li>
-                    </ul>
-                </div>
+                @* Links on the RIGHT: Logout *@
+                <ul class="navbar-nav mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="User" asp-action="Logout">Logout</a>
+                    </li>
+                </ul>
             </div>
-        </nav>
-    </header>
+            
+        </div>
+    </nav>
+</header>
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
