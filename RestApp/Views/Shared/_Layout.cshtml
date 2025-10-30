@@ -17,9 +17,12 @@
 }
 <body>
 <header>
-<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark-blue border-bottom box-shadow mb-3">
+<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3">
 <div class="container-fluid">
-    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Flavour Hub</a>
+   <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+    <img src="~/images/Logo/logo.png" alt="Flavour Hub Logo" style="height: 35px; margin-right: 10px; vertical-align: middle;" />
+    Flavour Hub
+</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -75,7 +78,7 @@
             @RenderBody()
 </main>
 </div>
-<footer class="border-top footer bg-dark-blue navbar-dark">
+<footer class="border-top footer bg-dark-blue mt-auto">    
     <div class="container">
         <span class="text-white">&copy; 2025 - restapp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></span>
     </div>

@@ -8,9 +8,10 @@ namespace restapp.Models
         [Key]
         public int SliderId { get; set; }
 
-        [Required]
+        
         public string? Name { get; set; }
         public string? DisplayText { get; set; }
+        [Required]
         public string? LinkText { get; set; }
         public string? SliderImagePath { get; set; }
 
