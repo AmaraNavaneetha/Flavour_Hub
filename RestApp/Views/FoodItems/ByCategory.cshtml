@@ -13,12 +13,13 @@
         @foreach (var item in Model)
         {
             <div class="col"> 
-            <div class="card h-100 shadow-sm rounded-4 food-item-card" 
+    <div class="card h-100 shadow-sm rounded-4 food-item-card" 
          data-full-desc="@item.ItemDescription"
          data-item-name="@item.ItemName"
          data-item-image="@Url.Content(item.ItemImagePath)">
                     
-                    <img src="@Url.Content(item.ItemImagePath)" class="card-img-top img-fluid rounded-top-4" alt="@item.ItemName" style="height:200px; object-fit:cover;" />
+                   @* ADD the class 'card-image-clickable' here *@
+        <img src="@Url.Content(item.ItemImagePath)" class="card-img-top img-fluid rounded-top-4 card-image-clickable" alt="@item.ItemName" style="height:200px; object-fit:cover;" />
                     
                     @* This is your main card body content that will be partially hidden or shifted *@
                     <div class="card-body d-flex flex-column justify-content-between">
@@ -111,10 +112,12 @@ else
         const tooltipImg = tooltip.querySelector('.tooltip-img');
         const tooltipName = tooltip.querySelector('.tooltip-name');
         const tooltipDescription = tooltip.querySelector('.tooltip-description');
+        const clickableImage = card.querySelector('.card-image-clickable'); // Select the image
 
+        // Populate tooltip content (same as before)
         if (tooltipImg && itemImage) {
             tooltipImg.src = itemImage;
-            tooltipImg.alt = itemName || 'Food Item'; // Set alt text for accessibility
+            tooltipImg.alt = itemName || 'Food Item';
         }
         if (tooltipName && itemName) {
             tooltipName.textContent = itemName;
@@ -122,5 +125,31 @@ else
         if (tooltipDescription && fullDescription) {
             tooltipDescription.textContent = fullDescription;
         }
+
+        // --- NEW CLICK EVENT HANDLER ---
+        if (clickableImage) {
+            clickableImage.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default image link behavior if it was an <a> tag
+                event.stopPropagation(); // Stop event from bubbling up (optional, but good practice)
+                
+                // Toggle the 'tooltip-active' class on the parent card
+                card.classList.toggle('tooltip-active');
+
+                // Optional: Close other open tooltips
+                document.querySelectorAll('.food-item-card.tooltip-active').forEach(otherCard => {
+                    if (otherCard !== card) {
+                        otherCard.classList.remove('tooltip-active');
+                    }
+                });
+            });
+        }
+        // --- END NEW CLICK EVENT HANDLER ---
+
+        // Optional: Hide tooltip when clicking anywhere else on the document
+        document.addEventListener('click', function(event) {
+             if (card.classList.contains('tooltip-active') && !card.contains(event.target)) {
+                 card.classList.remove('tooltip-active');
+             }
+         });
     });
 </script>
