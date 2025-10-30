@@ -62,13 +62,17 @@ namespace restapp.Services
         }
 
         // Filters by CategoryId AND ensures food item IsAvailable is TRUE
+        // Example implementation of DBServices.cs for the public view
         public List<FoodItem> GetFoodItemsByCategory(int categoryId)
         {
+            // DO NOT ADD THE .Where(f => f.IsAvailable) FILTER HERE
             return _dbContext.fooditems
                 .Include(f => f.category)
                 .Include(f => f.itemType)
-                .Where(f => f.CategoryId == categoryId && f.IsAvailable == true)
+                .Where(f => f.CategoryId == categoryId)
+                .OrderBy(f => f.ItemName)
                 .ToList();
+            // This will retrieve ALL items in the category, including unavailable ones.
         }
 
         // NOTE: Your original parameterless constructor is omitted here for brevity 

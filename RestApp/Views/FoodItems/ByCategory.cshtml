@@ -4,9 +4,9 @@
     /* 1. CSS to visually mark unavailable items */
     .unavailable-item {
         opacity: 0.6; /* Dim the card visually */
-        /* Blocks ALL clicks on the card itself */
-        pointer-events: none;
+        pointer-events: none; /* Blocks ALL clicks on the card itself */
         cursor: not-allowed; /* Show a "no entry" cursor */
+        filter: grayscale(80%); /* Added: Makes the image/card look drab/unavailable */
     }
 
         /* 🛑 CRITICAL FIX: Force block on all elements inside the unavailable card */
@@ -17,11 +17,27 @@
     /* We only want a pointer cursor when the item is actually available */
     .food-item-card:not(.unavailable-item) {
         cursor: pointer;
+        position: relative; /* Base for tooltip positioning */
+        overflow: hidden;
     }
 
-    /* Re-enable click for the tooltip description panel (if opened for an available item) */
+    /* Tooltip Styles for Popover Effect */
     .full-description-tooltip {
-        pointer-events: auto;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10;
+        display: none; /* Initially hidden */
+        pointer-events: auto; /* Re-enable click inside the tooltip panel itself */
+        background-color: rgba(255, 255, 255, 0.95); /* Semi-transparent white background */
+        backdrop-filter: blur(2px);
+        overflow-y: auto;
+    }
+
+    .food-item-card.tooltip-active .full-description-tooltip {
+        display: block; /* Show when active */
     }
 
     .unavailable-label {
@@ -33,8 +49,8 @@
 </style>
 
 <div class="mb-3">
-    <a href="@Url.Action("Menu", "Home")" class="btn" style="background-color: #f0f0f0; color: #333; border: 1px solid #ccc;">
-        ← Back
+    <a href="@Url.Action("Menu", "Home")" class="btn btn-light border">
+        ← Back to Menu
     </a>
 </div>
 
@@ -44,18 +60,9 @@
 
         @foreach (var item in Model)
         {
-            <div class="col"> 
-    <div class="card h-100 shadow-sm rounded-4 food-item-card" 
-         data-full-desc="@item.ItemDescription"
-         data-item-name="@item.ItemName"
-         data-item-image="@Url.Content(item.ItemImagePath)">
-                    
-                   @* ADD the class 'card-image-clickable' here *@
-        <img src="@Url.Content(item.ItemImagePath)" class="card-img-top img-fluid rounded-top-4 card-image-clickable" alt="@item.ItemName" style="height:200px; object-fit:cover;" />
-                    
-                    @* This is your main card body content that will be partially hidden or shifted *@
             // C# LOGIC: Check availability and set classes/variables
             bool isAvailable = item.IsAvailable;
+            // Apply the visual and interactive block class if not available
             string cardClass = isAvailable ? "shadow-sm" : "unavailable-item";
 
             <div class="col">
@@ -74,23 +81,17 @@
                                 @if (item.itemType?.ItemTypeName == "Veg")
                                 {
                                     <span class="d-inline-flex align-items-center gap-2">
-                                        <span class="d-inline-block border border-success rounded px-1 py-1" style="width: 20px; height: 20px; position: relative;">
-                                            <span class="bg-success rounded-circle" style="width: 10px; height: 10px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></span>
+                                        <span class="d-inline-block border border-success rounded" style="width: 20px; height: 20px; line-height: 18px; text-align: center;">
+                                            <span class="bg-success rounded-circle d-inline-block" style="width: 10px; height: 10px;"></span>
                                         </span>
-                                        <span class="text-success fw-semibold"></span>
                                     </span>
-
                                 }
                                 else
                                 {
-                                    @* Non-Veg Indicator *@
                                     <span class="d-inline-flex align-items-center gap-2">
-                                        <span class="d-inline-block bg-white border border-danger rounded px-1 py-1" style="width: 20px; height: 20px; position: relative; overflow: hidden;">
-                                            <svg viewBox="0 0 20 20" width="20" height="20" style="position: absolute; top: 0; left: 0;">
-                                                <polygon points="10,4 16,16 4,16" fill="red" />
-                                            </svg>
+                                        <span class="d-inline-block border border-danger rounded" style="width: 20px; height: 20px; line-height: 18px; text-align: center;">
+                                            <span class="text-danger fw-bold" style="font-size: 1.4rem;">▵</span>
                                         </span>
-                                        <span class="text-danger fw-semibold"></span>
                                     </span>
                                 }
 
@@ -98,13 +99,11 @@
                                 @if (!string.IsNullOrWhiteSpace(item.Rating) && item.RatingCount > 0)
                                 {
                                     var ratingValue = Convert.ToDouble(item.Rating);
-
                                     var starColor = ratingValue > 6 ? "#d4ac0d" : "#ffc107";
                                     <span class="d-inline-flex align-items-center gap-1">
                                         <i class="bi bi-star-fill" style="color:@starColor;">★</i> @item.Rating
                                         <small class="text-muted">(@item.RatingCount ratings)</small>
                                     </span>
-
                                 }
                                 else
                                 {
@@ -134,10 +133,13 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="fw-bold fs-5 mb-0">₹@item.SellingPrice</span>
 
-                                @* CONDITIONAL BUTTON LOGIC *@
+                                @* CONDITIONAL BUTTON LOGIC (Use a form for proper cart action) *@
                                 @if (isAvailable)
                                 {
-                                    <button class="btn btn-success btn-sm">Add</button>
+                                    <form asp-controller="Cart" asp-action="AddToCart" method="post" style="display:inline;">
+                                        <input type="hidden" name="itemId" value="@item.ItemId" />
+                                        <button type="submit" class="btn btn-success btn-sm">Add</button>
+                                    </form>
                                 }
                                 else
                                 {
@@ -147,21 +149,19 @@
                         </div>
                     </div>
 
-                    @* New Tooltip Structure *@
+                    @* New Tooltip Structure - Populates content on load *@
                     <div class="full-description-tooltip bg-white p-3 rounded-4 shadow-lg">
-                        <img class="tooltip-img img-fluid rounded-4" alt="" />
-                        <h6 class="tooltip-name mt-2 mb-1"></h6>
-                        <p class="tooltip-description mb-0 text-dark"></p>
+                        <img class="tooltip-img img-fluid rounded-4" alt="" style="max-height: 150px; object-fit: cover; width: 100%;" />
+                        <h6 class="tooltip-name mt-2 mb-1 fw-bold"></h6>
+                        <p class="tooltip-description mb-0 text-dark small"></p>
                     </div>
 
                 </div>
-            </div>
 
+            </div>
         }
     </div>
-
 }
-
 else
 {
     <p class="text-center text-muted">No food items found in this category.</p>
@@ -169,19 +169,12 @@ else
 
 <script>
     document.querySelectorAll('.food-item-card').forEach(card => {
-        // Retrieve data attributes
+        // Retrieve data attributes and populate tooltip content
         const fullDescription = card.getAttribute('data-full-desc');
         const itemName = card.getAttribute('data-item-name');
         const itemImage = card.getAttribute('data-item-image');
-
-        // Get tooltip elements
         const tooltip = card.querySelector('.full-description-tooltip');
-        const tooltipImg = tooltip.querySelector('.tooltip-img');
-        const tooltipName = tooltip.querySelector('.tooltip-name');
-        const tooltipDescription = tooltip.querySelector('.tooltip-description');
-        const clickableImage = card.querySelector('.card-image-clickable'); // Select the image
 
-        // Populate tooltip content
         if (tooltip) {
             tooltip.querySelector('.tooltip-img').src = itemImage || '';
             tooltip.querySelector('.tooltip-img').alt = itemName || 'Food Item';
@@ -189,67 +182,39 @@ else
             tooltip.querySelector('.tooltip-description').textContent = fullDescription || '';
         }
 
-        // --- CLICK EVENT HANDLER on the main card ---
-        // CSS 'pointer-events: none' on '.unavailable-item' will prevent this from firing when disabled.
+        // --- SINGLE, CONSOLIDATED CLICK EVENT HANDLER on the main card ---
         card.addEventListener('click', function (event) {
 
-            // This condition is the main click-to-show-tooltip logic
-            if (card.contains(event.target)) {
-
+            // If CSS pointer-events is working, this is redundant but a good defense.
+            if (card.classList.contains('unavailable-item')) {
                 event.preventDefault();
                 event.stopPropagation();
-
-                // Toggle the 'tooltip-active' class on the parent card
-                card.classList.toggle('tooltip-active');
-
-        // Populate tooltip content (same as before)
-        if (tooltipImg && itemImage) {
-            tooltipImg.src = itemImage;
-            tooltipImg.alt = itemName || 'Food Item';
-        }
-        if (tooltipName && itemName) {
-            tooltipName.textContent = itemName;
-        }
-        if (tooltipDescription && fullDescription) {
-            tooltipDescription.textContent = fullDescription;
-        }
-
-        // --- NEW CLICK EVENT HANDLER ---
-        if (clickableImage) {
-            clickableImage.addEventListener('click', function(event) {
-                event.preventDefault(); // Prevent default image link behavior if it was an <a> tag
-                event.stopPropagation(); // Stop event from bubbling up (optional, but good practice)
-                
-                // Toggle the 'tooltip-active' class on the parent card
-                card.classList.toggle('tooltip-active');
-
-                // Optional: Close other open tooltips
-                document.querySelectorAll('.food-item-card.tooltip-active').forEach(otherCard => {
-                    if (otherCard !== card) {
-                        otherCard.classList.remove('tooltip-active');
-                    }
-                });
-            });
-        }
-        // --- END NEW CLICK EVENT HANDLER ---
-
-        // Optional: Hide tooltip when clicking anywhere else on the document
-        document.addEventListener('click', function(event) {
-             if (card.classList.contains('tooltip-active') && !card.contains(event.target)) {
-                 card.classList.remove('tooltip-active');
-             }
-         });
-    });
-                // Close other open tooltips
-                document.querySelectorAll('.food-item-card.tooltip-active').forEach(otherCard => {
-                    if (otherCard !== card) {
-                        otherCard.classList.remove('tooltip-active');
-                    }
-                });
+                return;
             }
+
+            // Check if the click was on an interactive element (like the Add button)
+            const clickedElement = event.target;
+            const isControl = clickedElement.closest('button, a, form');
+
+            if (isControl) {
+                return; // Let the control element handle the click (e.g., submit the form)
+            }
+
+            // Main Logic: Toggle the tooltip
+            event.preventDefault();
+            event.stopPropagation();
+
+            card.classList.toggle('tooltip-active');
+
+            // Close other open tooltips
+            document.querySelectorAll('.food-item-card.tooltip-active').forEach(otherCard => {
+                if (otherCard !== card) {
+                    otherCard.classList.remove('tooltip-active');
+                }
+            });
         });
 
-        // Optional: Hide tooltip when clicking anywhere else on the document
+        // Hide tooltip when clicking anywhere else on the document
         document.addEventListener('click', function (event) {
             if (card.classList.contains('tooltip-active') && !card.contains(event.target)) {
                 card.classList.remove('tooltip-active');
