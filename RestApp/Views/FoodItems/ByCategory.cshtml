@@ -143,9 +143,10 @@
                                     else if (currentQuantity == 0)
                                     {
                                         // --- A. Simple ADD Button (Visible when Q = 0) ---
-                                        <form asp-controller="Cart" asp-action="AddToCart" method="post" style="display:inline;">
-                                            <input type="hidden" name="itemId" value="@item.ItemId" />
-                                            <button type="submit" class="btn btn-success btn-sm">Add</button>
+                                        <form asp-controller="User" asp-action="AddToCartSubmit" method="post" style="display:inline;">
+                                        <input type="hidden" name="id" value="@item.ItemId" /> @* Note: Changed from itemId to id to match controller parameter *@
+                                        <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                                        <button type="submit" class="btn btn-success btn-sm">Add</button>
                                         </form>
                                     }
                                     else
@@ -153,7 +154,7 @@
                                         // --- B. Quantity Selector (Visible when Q > 0) - This uses placeholder actions ---
                                         <div class="quantity-selector" data-item-id="@item.ItemId">
 
-                                            <form asp-controller="Cart" asp-action="DecrementItem" method="post" style="display: inline;">
+                                            <form asp-controller="User" asp-action="RemoveFromCartSubmit" method="post" style="display: inline;">
                                                 <input type="hidden" name="itemId" value="@item.ItemId" />
                                                 <button type="submit" class="btn btn-outline-secondary btn-sm quantity-btn decrement-btn">
                                                     @if (currentQuantity == 1)
@@ -169,7 +170,7 @@
 
                                             <span class="item-quantity px-2">@currentQuantity</span>
 
-                                            <form asp-controller="Cart" asp-action="AddToCart" method="post" style="display: inline;">
+                                            <form asp-controller="User" asp-action="AddToCartSubmit" method="post" style="display: inline;">
                                                 <input type="hidden" name="itemId" value="@item.ItemId" />
                                                 <button type="submit" class="btn btn-outline-secondary btn-sm quantity-btn increment-btn">
                                                     <i class="bi bi-plus"></i>
