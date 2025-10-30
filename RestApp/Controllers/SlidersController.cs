@@ -150,8 +150,7 @@ namespace restapp.Controllers
                 //replace old path with new path
                 eS.SliderImagePath = @"/images/sliders/" + upS.SliderImage.FileName;
             }
-            eS.Name = upS.Name;
-            eS.DisplayText = upS.DisplayText;
+
             eS.LinkText = upS.LinkText;
             eS.Status = upS.Status;
             eS.DisplayOrderNo = upS.DisplayOrderNo;

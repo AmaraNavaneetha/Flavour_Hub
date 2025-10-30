@@ -8,11 +8,11 @@ namespace restapp.Models
         [Key]
         public int CategoryId { get; set; }
 
-        
+        [Required(ErrorMessage="The category name is required")]
         [MaxLength(30, ErrorMessage = "Invalid size")]
         public string CategoryName { get; set; } = string.Empty;
 
-        
+        [Required(ErrorMessage = "The category description is required")]
         [MaxLength(1500, ErrorMessage = "Invalid size")]
         public string CategoryDescription { get; set; } = string.Empty;
 

@@ -34,7 +34,7 @@ body {
 
 .info-section {
     padding: 20px;
-    background: #CF7342;
+    background: #FDD7B1;
     border-radius: 8px;
     margin-bottom: 20px;
     text-align: center;
@@ -43,7 +43,7 @@ body {
 .section-title {
     font-size: 1.8rem;
     margin-bottom: 15px;
-    color: #00008B;
+    color: #8B4513;
 }
 
 .info-section p {
