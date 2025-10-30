@@ -1,0 +1,66 @@
+﻿@* File: Views/User/OrderConfirmation.cshtml *@
+@{
+    ViewData["Title"] = "Order Confirmation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // Retrieve data passed via TempData from PlaceOrder
+    string paymentMethod = TempData["PaymentMethod"] as string ?? "COD";
+    int orderId = (int)(TempData["OrderId"] ?? 0);
+
+    // FIX: Retrieve OrderTotal as string and parse it back to decimal.
+    string orderTotalString = TempData["OrderTotal"] as string ?? "0.00";
+    decimal orderTotal = decimal.Parse(orderTotalString);
+
+    bool showOnlineAlert = (bool)(ViewBag.ShowOnlineAlert ?? false);
+}
+
+<div class="container my-5 text-center" style="max-width: 600px;">
+    <div class="card p-5 shadow-lg border-success">
+        <i class="fas fa-check-circle text-success mb-3" style="font-size: 4rem;"></i>
+        <h2 class="text-success mb-3">Order Placed Successfully!</h2>
+
+        <p class="lead">Your order **#@orderId** has been successfully placed and is being processed.</p>
+
+        <ul class="list-group list-group-flush mb-4">
+            <li class="list-group-item d-flex justify-content-between">
+                <span>Payment Method:</span>
+                <span class="fw-bold">@paymentMethod</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between fw-bold fs-5 bg-light">
+                <span>Final Amount:</span>
+                <span>₹@orderTotal</span>
+            </li>
+        </ul>
+
+        @if (paymentMethod == "COD")
+        {
+            <div class="alert alert-info">
+                Thank you! Please keep **₹@orderTotal** ready for payment upon delivery.
+            </div>
+        }
+
+        <a href="@Url.Action("Index", "Home")" class="btn btn-primary mt-3">Continue Shopping</a>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        // Ensure you have jQuery loaded in your _Layout.cshtml for $(document).ready() to work
+        $(document).ready(function () {
+            // Retrieve the flag passed from the controller
+            var isOnlinePayment = @(ViewBag.ShowOnlineAlert ? "true" : "false");
+
+            // Your custom success message
+            var successMessage = 'Order submitted successfully! Your order will be delivered in a few minutes.';
+
+            if (isOnlinePayment) {
+                // Alert for UPI/Online Payment
+                alert('Redirecting to Payment Gateway... ' + successMessage);
+            } else {
+                 // Alert for COD
+                 alert('Order Placed Successfully via Cash On Delivery! ' + successMessage);
+            }
+        });
+    </script>
+}

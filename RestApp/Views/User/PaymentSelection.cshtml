@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "Payment Selection";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    // Retrieve the total passed from the Checkout action
+    decimal cartTotal = (decimal)ViewData["CartTotal"];
+}
+
+<div class="container my-5" style="max-width: 600px;">
+    <h2 class="text-center mb-4 text-primary-blue">💰 Select Payment Method</h2>
+    <hr />
+
+    <div class="card p-4 shadow-sm mb-4">
+        <h4 class="card-title">Order Total: <span class="float-end fw-bold">₹@cartTotal</span></h4>
+    </div>
+
+    @* Form submits to the PlaceOrder action *@
+    <form asp-controller="User" asp-action="PlaceOrder" method="post">
+
+        <div class="list-group mb-4">
+
+            <label class="list-group-item list-group-item-action">
+                <input type="radio" name="PaymentMethod" value="COD" required checked />
+                <span class="ms-3 fw-bold">Cash On Delivery (COD)</span>
+                <p class="text-muted small mb-0">Pay upon delivery.</p>
+            </label>
+
+            <label class="list-group-item list-group-item-action">
+                <input type="radio" name="PaymentMethod" value="UPI" required />
+                <span class="ms-3 fw-bold">UPI / Online Payment</span>
+                <p class="text-muted small mb-0">Pay instantly to confirm the order.</p>
+            </label>
+
+        </div>
+
+        <button type="submit" class="btn btn-success btn-lg w-100">
+            Confirm and Place Order (₹@cartTotal)
+        </button>
+    </form>
+
+    <div class="text-center mt-3">
+        <a href="@Url.Action("Cart", "User")" class="btn btn-outline-secondary">← Back to Cart</a>
+    </div>
+</div>

@@ -4,292 +4,28 @@ using Newtonsoft.Json;
 using restapp.Dal;
 using restapp.Models;
 using System.Reflection.Metadata.Ecma335;
+using Microsoft.EntityFrameworkCore; // Needed for SaveChangesAsync
+using System.Security.Cryptography.X509Certificates;
 
 namespace restapp.Controllers
 {
     public class UserController : Controller
     {
-        //created a context class object for this controller. because it uses context class
         private readonly RestContext _context;
-        //created a constructor to usercontroller. the memory for the dbcontext object is created 
-        //only when the controller is used/ called
+
         public UserController(RestContext context)
         {
             _context = context;
         }
-        public IActionResult Login() // returns login.cshtml (view)
+
+        // --- HELPER METHODS ---
+
+        // NEW: Helper to get the logged-in user ID from the session
+        private string? GetUserId()
         {
-            return View();
+            // The session key is "loggedinuser" as per your login logic
+            return HttpContext.Session.GetString("loggedinuser");
         }
-       
-
-
-        public IActionResult Logout() // removing the user logged in details from the session
-        {
-            HttpContext.Session.Remove("loggedinuser");
-            HttpContext.Session.Remove("loggedinuserRole");
-
-            return RedirectToAction("Index", "Home");
-        }
-
-        //after the user clicks the signin button in login view then
-        //the data will be sent to validateUser action to get validated 
-        // Inside UserController.cs
-
-        [HttpPost]
-        public IActionResult ValidateUser(UserLogin ul)
-        {
-            if (!ModelState.IsValid)
-            {
-                // Return to Login view, showing any model validation errors (e.g., empty fields)
-                return View("Login", ul); // Pass the model back to retain input
-            }
-
-            // 1. Check if the user ID exists (case-insensitive check)
-            User? user = _context.users.FirstOrDefault(u => u.UserId.ToLower() == ul.UserId.ToLower());
-
-            // Check if the user was found
-            if (user == null)
-            {
-                // User ID not found
-                ModelState.AddModelError(string.Empty, "The username you entered is not registered.");
-                return View("Login", ul);
-            }
-
-            // 2. Check the password (since the user was found)
-            // NOTE: Your current code uses plain text password comparison (u.Password == ul.Password).
-            // In a real application, this should be replaced with a secure password HASH verification.
-            if (user.Password != ul.Password)
-            {
-                // Password found but doesn't match the one entered
-                ModelState.AddModelError(string.Empty, "The password you entered is incorrect."); // Specific error for wrong password
-                return View("Login", ul);
-            }
-
-            // 3. User found and password matches (Authentication Successful)
-            // The rest of your original logic for status and role checking goes here.
-
-            if (user.Status == true)
-            {
-                // Check for user's role type
-                Role r = _context.roles.Find(user.RoleId);
-                if (r != null)
-                {
-                    if (r.RoleName == "Admin")
-                    {
-                        HttpContext.Session.SetString("loggedinuser", ul.UserId);
-                        HttpContext.Session.SetString("loggedinuserRole", "Admin");
-                        return RedirectToAction("Index", "Admin");
-                    }
-                    else if (r.RoleName == "Employee1")
-                    {
-                        HttpContext.Session.SetString("loggedinuser", ul.UserId);
-                        HttpContext.Session.SetString("loggedinuserRole", "Employee1");
-                        return RedirectToAction("Index", "Employee1");
-                    }
-                    // ... (Continue with other roles) ...
-                    else if (r.RoleName == "User")
-                    {
-                        HttpContext.Session.SetString("loggedinuser", ul.UserId);
-                        HttpContext.Session.SetString("loggedinuserRole", "User");
-                        return RedirectToAction("Index", "Home");
-                    }
-                    else
-                    {
-                        // Fallback for an unrecognized role
-                        ModelState.AddModelError(string.Empty, "Your account has an invalid role configuration.");
-                        return View("Login", ul);
-                    }
-                }
-                else
-                {
-                    // Fallback if role ID is set but role object is missing
-                    ModelState.AddModelError(string.Empty, "Could not verify user role.");
-                    return View("Login", ul);
-                }
-            }
-            else
-            {
-                // User status is not active (admin approval pending/denied)
-                ModelState.AddModelError(string.Empty, "Your account is inactive. Please contact the administrator.");
-                return View("Login", ul);
-            }
-        }
-        public IActionResult Register()
-        {
-            return View();
-        }
-
-        // 1. NEW: [HttpPost] Action to handle user registration
-        [HttpPost]
-        public IActionResult RegisterUser(User u)
-        {
-            // Check if the submitted data is valid based on model annotations
-            if (!ModelState.IsValid)
-            {
-                return View("Register", u); // Return to Register view with data and errors
-            }
-
-            try
-            {
-                // A. Check if UserId already exists to prevent duplicate
-                if (_context.users.Any(user => user.UserId.ToLower() == u.UserId.ToLower()))
-                {
-                    ModelState.AddModelError("UserId", "This Username is already taken.");
-                    return View("Register", u);
-                }
-
-                // B. Set the default RoleId for a new 'User'
-                // You must get the ID of the 'User' role from your database. Assuming RoleId = 4 for 'User' based on your logic flow.
-                // Replace 4 with the actual ID of the 'User' role from your 'roles' table.
-                Role? defaultRole = _context.roles.FirstOrDefault(r => r.RoleName == "User");
-                u.RoleId = defaultRole?.RoleId ?? 0; // Set RoleId, handle null if role not found
-
-                // C. Status should be set here if not handled by the view (it is currently taken from the view, but good practice is to control it here)
-                // u.Status = false; // Example: Set to false for admin approval
-
-                _context.users.Add(u);
-                _context.SaveChanges();
-
-                // D. Set the success message in TempData before redirecting
-                TempData["SuccessMessage"] = "Registration successful! Please login with your new credentials.";
-
-                // E. Redirect to the Login page
-                return RedirectToAction("Login");
-            }
-            catch (Exception ex)
-            {
-                // Log the error (best practice) and return to the registration form with a generic error
-                ModelState.AddModelError(string.Empty, "An unexpected error occurred during registration.");
-                // Optional: You might want to remove the password field from the model before returning to the view for security.
-                return View("Register", u);
-            }
-        }
-        // Inside UserController.cs
-
-        // Action to display the user's profile and pre-fill the edit form.
-        public IActionResult Profile()
-        {
-            // 1. Authorization Check (already added in UserMenu, but good practice here too)
-            string? loggedInUserId = HttpContext.Session.GetString("loggedinuser");
-            if (loggedInUserId == null)
-            {
-                return RedirectToAction("Login", "User");
-            }
-
-            // 2. Fetch User Data
-            // Fetch the full User object from the database using the UserId stored in the session.
-            User? user = _context.users.FirstOrDefault(u => u.UserId.ToLower() == loggedInUserId.ToLower());
-
-            if (user == null)
-            {
-                // Handle case where session is set but user doesn't exist (e.g., deleted by admin)
-                HttpContext.Session.Remove("loggedinuser");
-                HttpContext.Session.Remove("loggedinuserRole");
-                return RedirectToAction("Login", "User");
-            }
-
-            // 3. Pass the user object to the View
-            return View(user);
-        }
-
-        // Action to handle the form submission when the user clicks 'Save Changes'.
-        [HttpPost]
-        public IActionResult Profile(User updatedUser) // The form binds to the User model
-        {
-            // 1. Authorization Check
-            string? loggedInUserId = HttpContext.Session.GetString("loggedinuser");
-            if (loggedInUserId == null)
-            {
-                return RedirectToAction("Login", "User");
-            }
-
-            // Ensure the submitted ID matches the logged-in user's ID
-            if (updatedUser.UserId.ToLower() != loggedInUserId.ToLower())
-            {
-                // Security check: prevent editing another user's profile
-                return Forbid();
-            }
-
-            // 2. Model Validation
-            // Remove RoleId and Status from validation, as they are often handled server-side or not part of the form.
-            ModelState.Remove("RoleId");
-            ModelState.Remove("Status");
-
-            if (!ModelState.IsValid)
-            {
-                TempData["ErrorMessage"] = "Please correct the errors in the form.";
-                return View(updatedUser); // Return with validation errors
-            }
-
-            try
-            {
-                // 3. Fetch the original user record from the database
-                User? originalUser = _context.users.Find(updatedUser.Id); // Assuming 'Id' is the primary key. If not, use FirstOrDefault.
-
-                if (originalUser == null)
-                {
-                    TempData["ErrorMessage"] = "User not found.";
-                    return RedirectToAction("Logout", "User");
-                }
-
-                // 4. Update ONLY the editable properties
-                originalUser.FirstName = updatedUser.FirstName;
-                originalUser.LastName = updatedUser.LastName;
-                // originalUser.UserId is generally not editable
-                originalUser.Mobile = updatedUser.Mobile;
-                originalUser.Email = updatedUser.Email;
-
-                // Only update password if the user entered a new one (requires a change in the model/view)
-                if (!string.IsNullOrEmpty(updatedUser.Password))
-                {
-                    originalUser.Password = updatedUser.Password;
-                }
-
-                // 5. Save Changes
-                _context.users.Update(originalUser);
-                _context.SaveChanges();
-
-                TempData["SuccessMessage"] = "Your profile has been updated successfully!";
-                return RedirectToAction("Profile");
-            }
-            catch (Exception ex)
-            {
-                // Log the error
-                TempData["ErrorMessage"] = "An unexpected error occurred while saving your details.";
-                return View(updatedUser);
-            }
-        }
-        // Inside UserController.cs, add this new action:
-
-        
-
-        public IActionResult Cart()
-        {
-            // 1. Authorization Check (Optional, but good practice)
-            string? loggedInUserRole = HttpContext.Session.GetString("loggedinuserRole");
-            if (loggedInUserRole != "User")
-            {
-                // If not logged in as a user, redirect them (e.g., to login or home)
-                return RedirectToAction("Index", "Home");
-            }
-
-            // 2. Retrieve Cart Data from Session
-            List<CartItem> cart = new List<CartItem>();
-            string? cartJson = HttpContext.Session.GetString("ShoppingCart");
-
-            if (!string.IsNullOrEmpty(cartJson))
-            {
-                // Deserialize the JSON string back into a List<CartItem>
-                // Ensure Newtonsoft.Json is imported if not already.
-                cart = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CartItem>>(cartJson) ?? new List<CartItem>();
-            }
-
-            // 3. Return the List of CartItems to a View named 'Cart.cshtml'
-            return View(cart);
-        }
-
-        // --- HELPER METHODS FOR CART MANAGEMENT (Add these inside UserController) ---
 
         // Helper to get cart from session
         private List<CartItem> GetCartFromSession()
@@ -309,30 +45,198 @@ namespace restapp.Controllers
             string updatedCartJson = Newtonsoft.Json.JsonConvert.SerializeObject(cart);
             HttpContext.Session.SetString("ShoppingCart", updatedCartJson);
         }
-        // Inside UserController.cs, add/replace these methods:
 
-        // --- Helper to determine the redirect location ---
-        private string GetRedirectAction(string categoryName)
+        // --- AUTHENTICATION ACTIONS ---
+
+        public IActionResult Login() // returns login.cshtml (view)
         {
-            // Assuming you are using a 'ByCategory' action in the Home controller
-            // or you can redirect back to a generic Menu action.
-            // Adjust this to match your actual menu action.
-            return Url.Action("ByCategory", "Home", new { category = categoryName }) ?? Url.Action("Menu", "Home");
+            return View();
         }
 
+        public IActionResult Logout() // removing the user logged in details from the session
+        {
+            HttpContext.Session.Remove("loggedinuser");
+            HttpContext.Session.Remove("loggedinuserRole");
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpPost]
+        public IActionResult ValidateUser(UserLogin ul)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("Login", ul);
+            }
+
+            User? user = _context.users.FirstOrDefault(u => u.UserId.ToLower() == ul.UserId.ToLower());
+
+            if (user == null)
+            {
+                ModelState.AddModelError(string.Empty, "The username you entered is not registered.");
+                return View("Login", ul);
+            }
+
+            if (user.Password != ul.Password)
+            {
+                ModelState.AddModelError(string.Empty, "The password you entered is incorrect.");
+                return View("Login", ul);
+            }
+
+            if (user.Status == true)
+            {
+                // Find the role based on the RoleId
+                Role? r = _context.roles.Find(user.RoleId);
+
+                if (r != null)
+                {
+                    HttpContext.Session.SetString("loggedinuser", ul.UserId);
+                    HttpContext.Session.SetString("loggedinuserRole", r.RoleName); // Store the actual role name
+
+                    if (r.RoleName == "Admin")
+                    {
+                        return RedirectToAction("Index", "Admin");
+                    }
+                    else if (r.RoleName == "Employee1")
+                    {
+                        return RedirectToAction("Index", "Employee1");
+                    }
+                    else if (r.RoleName == "User")
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Your account has an unrecognized role configuration.");
+                        return View("Login", ul);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Could not verify user role.");
+                    return View("Login", ul);
+                }
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Your account is inactive. Please contact the administrator.");
+                return View("Login", ul);
+            }
+        }
+
+        // --- REGISTRATION & PROFILE ACTIONS (Omitted for brevity, assuming they are correct) ---
+        public IActionResult Register() { return View(); }
+        [HttpPost]
+        public IActionResult RegisterUser(User u)
+        {
+            // ... (Your RegisterUser implementation) ...
+            if (!ModelState.IsValid) return View("Register", u);
+
+            try
+            {
+                if (_context.users.Any(user => user.UserId.ToLower() == u.UserId.ToLower()))
+                {
+                    ModelState.AddModelError("UserId", "This Username is already taken.");
+                    return View("Register", u);
+                }
+
+                Role? defaultRole = _context.roles.FirstOrDefault(r => r.RoleName == "User");
+                u.RoleId = defaultRole?.RoleId ?? 0;
+
+                _context.users.Add(u);
+                _context.SaveChanges();
+
+                TempData["SuccessMessage"] = "Registration successful! Please login with your new credentials.";
+                return RedirectToAction("Login");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, "An unexpected error occurred during registration.");
+                return View("Register", u);
+            }
+        }
+        public IActionResult Profile()
+        {
+            string? loggedInUserId = HttpContext.Session.GetString("loggedinuser");
+            if (loggedInUserId == null) return RedirectToAction("Login", "User");
+
+            User? user = _context.users.FirstOrDefault(u => u.UserId.ToLower() == loggedInUserId.ToLower());
+            if (user == null) { HttpContext.Session.Clear(); return RedirectToAction("Login", "User"); }
+
+            return View(user);
+        }
+        [HttpPost]
+        public IActionResult Profile(User updatedUser)
+        {
+            string? loggedInUserId = HttpContext.Session.GetString("loggedinuser");
+            if (loggedInUserId == null) return RedirectToAction("Login", "User");
+
+            if (updatedUser.UserId.ToLower() != loggedInUserId.ToLower()) return Forbid();
+
+            ModelState.Remove("RoleId");
+            ModelState.Remove("Status");
+
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Please correct the errors in the form.";
+                return View(updatedUser);
+            }
+
+            try
+            {
+                User? originalUser = _context.users.Find(updatedUser.Id);
+
+                if (originalUser == null)
+                {
+                    TempData["ErrorMessage"] = "User not found.";
+                    return RedirectToAction("Logout", "User");
+                }
+
+                originalUser.FirstName = updatedUser.FirstName;
+                originalUser.LastName = updatedUser.LastName;
+                originalUser.Mobile = updatedUser.Mobile;
+                originalUser.Email = updatedUser.Email;
+
+                if (!string.IsNullOrEmpty(updatedUser.Password))
+                {
+                    originalUser.Password = updatedUser.Password;
+                }
+
+                _context.users.Update(originalUser);
+                _context.SaveChanges();
+
+                TempData["SuccessMessage"] = "Your profile has been updated successfully!";
+                return RedirectToAction("Profile");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "An unexpected error occurred while saving your details.";
+                return View(updatedUser);
+            }
+        }
+
+        // --- CART ACTIONS ---
+
+        public IActionResult Cart()
+        {
+            string? loggedInUserRole = HttpContext.Session.GetString("loggedinuserRole");
+            if (loggedInUserRole != "User")
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            List<CartItem> cart = GetCartFromSession();
+            return View(cart);
+        }
 
         [HttpPost]
         public IActionResult AddToCartSubmit(int id, string returnUrl) // 'id' is FoodItem.Id
         {
-            // You should modify your view to pass the current category name or return URL
-            // so you can redirect back to the correct page after updating the cart.
-
-            // 1. Authorization & Fetch Item (Same as before)
-            // ...
+            // Fetch Item
             var foodItem = _context.fooditems.FirstOrDefault(f => f.ItemId == id);
-            // ... (Error handling if item not found) ...
+            if (foodItem == null) { TempData["ErrorMessage"] = "Item not found."; return RedirectToAction("Menu", "Home"); }
 
-            // 2. Get/Update Cart (Same logic as before)
+            // Get/Update Cart
             List<CartItem> cart = GetCartFromSession();
             CartItem? existingItem = cart.FirstOrDefault(item => item.FoodItemId == id);
 
@@ -352,11 +256,10 @@ namespace restapp.Controllers
                 cart.Add(newCartItem);
             }
 
-            // 3. Save and Redirect
+            // Save and Redirect
             SaveCartToSession(cart);
             TempData["SuccessMessage"] = $"{foodItem.ItemName} added to cart!";
 
-            // Redirect back to the page the user was on
             if (!string.IsNullOrEmpty(returnUrl))
             {
                 return Redirect(returnUrl);
@@ -368,28 +271,20 @@ namespace restapp.Controllers
         [HttpPost]
         public IActionResult RemoveFromCartSubmit(int id, string returnUrl)
         {
-            // 1. Authorization (Check the role if needed, though for cart operations, 
-            // it’s often okay as long as the session cart is protected)
-            // ... your existing authorization logic here if any ...
-
-            // 2. Get/Update Cart
             List<CartItem> cart = GetCartFromSession();
             CartItem? existingItem = cart.FirstOrDefault(item => item.FoodItemId == id);
 
             if (existingItem != null)
             {
-                // DECREASE QUANTITY BY ONE
                 existingItem.Quantity--;
 
                 if (existingItem.Quantity <= 0)
                 {
-                    // REMOVE ITEM if quantity hits zero
                     cart.Remove(existingItem);
                     TempData["SuccessMessage"] = $"{existingItem.Name} has been completely removed from your cart.";
                 }
                 else
                 {
-                    // QUANTITY DECREASED
                     TempData["SuccessMessage"] = $"{existingItem.Name} quantity reduced to {existingItem.Quantity}.";
                 }
             }
@@ -398,22 +293,18 @@ namespace restapp.Controllers
                 TempData["ErrorMessage"] = "Could not find item in cart to reduce quantity.";
             }
 
-            // 3. Save and Redirect
             SaveCartToSession(cart);
 
-            // Redirect back to the page the user was on (Menu or Cart)
             if (!string.IsNullOrEmpty(returnUrl))
             {
-                // This is important for handling quantity changes on the Cart page itself.
                 return Redirect(returnUrl);
             }
             return RedirectToAction("Menu", "Home"); // Fallback
         }
-        // NEW: Action to remove a specific item completely from the cart list, regardless of quantity.
+
         [HttpPost]
         public IActionResult RemoveItemFullyFromCart(int id)
         {
-            // 1. Authorization Check (Ensures only a User can delete items)
             string? loggedInUserRole = HttpContext.Session.GetString("loggedinuserRole");
             if (loggedInUserRole != "User")
             {
@@ -421,7 +312,6 @@ namespace restapp.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            // 2. Get Cart from Session
             List<CartItem> cart = GetCartFromSession();
             CartItem? existingItem = cart.FirstOrDefault(item => item.FoodItemId == id);
             string itemName = "Item";
@@ -429,10 +319,7 @@ namespace restapp.Controllers
             if (existingItem != null)
             {
                 itemName = existingItem.Name;
-
-                // Remove the item entirely from the cart list
                 cart.Remove(existingItem);
-
                 TempData["SuccessMessage"] = $"{itemName} has been completely removed from your cart.";
             }
             else
@@ -440,9 +327,114 @@ namespace restapp.Controllers
                 TempData["ErrorMessage"] = "Could not find item in cart to remove.";
             }
 
-            // 3. Save the updated Cart and Redirect
             SaveCartToSession(cart);
-            return RedirectToAction("Cart"); // Redirect back to the Cart view
+            return RedirectToAction("Cart");
+        }
+
+        // --- ORDER & PAYMENT ACTIONS ---
+
+        // NEW: Action to display the payment selection page
+        public IActionResult Checkout()
+        {
+            string? userId = GetUserId();
+            List<CartItem> cartItems = GetCartFromSession();
+
+            if (string.IsNullOrEmpty(userId) || cartItems.Count == 0)
+            {
+                TempData["ErrorMessage"] = string.IsNullOrEmpty(userId) ? "Please log in to proceed." : "Your cart is empty.";
+                return RedirectToAction("Menu", "Home");
+            }
+
+            // Calculate total and pass it to the view
+            decimal cartTotal = cartItems.Sum(i => i.Price * i.Quantity);
+            ViewData["CartTotal"] = cartTotal;
+
+            // This should return the 'PaymentSelection.cshtml' view
+            return View("PaymentSelection");
+        }
+
+        // NEW: Action to place the order and save it to the database
+        [HttpPost]
+        public async Task<IActionResult> PlaceOrder(string PaymentMethod)
+        {
+            // This now successfully calls the new GetUserId() helper
+            string? userId = GetUserId();
+            List<CartItem> cartItems = GetCartFromSession();
+
+            if (string.IsNullOrEmpty(userId) || cartItems.Count == 0)
+            {
+                TempData["ErrorMessage"] = string.IsNullOrEmpty(userId) ? "Please log in to proceed." : "Your cart is empty.";
+                return RedirectToAction("Menu", "Home");
+            }
+
+            decimal cartTotal = cartItems.Sum(i => i.Price * i.Quantity);
+
+            // 2. Create Order Header 
+            var order = new Orders
+            {
+                UserId = userId,
+                OrderDate = DateTime.Now,
+                TotalAmount = cartTotal,
+                PaymentMethod = PaymentMethod,
+                OrderStatus = "Placed"
+            };
+
+            _context.orders.Add(order);
+
+            // 4. Save to Database to get the Order.Id (Identity is populated here)
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Handle database errors if the Order table is not configured correctly
+                TempData["ErrorMessage"] = "Error saving order details to the database. Ensure Order and OrderDetail tables exist.";
+                return RedirectToAction("Cart");
+            }
+
+            // 3. Create Order Details
+            foreach (var item in cartItems)
+            {
+                var orderDetail = new OrdersDetail
+                {
+                    OrderId = order.Id, // Use the generated ID
+                    FoodItemId = item.FoodItemId,
+                    Quantity = item.Quantity,
+                    UnitPrice = item.Price
+                };
+                _context.orderDetails.Add(orderDetail);
+            }
+
+            // 5. Save Order Details
+            await _context.SaveChangesAsync();
+
+            // 6. Clear Cart Session & Redirect
+            HttpContext.Session.Remove("ShoppingCart");
+
+            TempData["PaymentMethod"] = PaymentMethod;
+            TempData["OrderId"] = order.Id;
+            TempData["OrderTotal"] = cartTotal;
+
+            bool showOnlineAlert = (PaymentMethod == "UPI");
+            return RedirectToAction("OrderConfirmation", new { showOnlineAlert = showOnlineAlert });
+        }
+
+        // NEW: Action to display the order confirmation page
+        public IActionResult OrderConfirmation(bool showOnlineAlert = false)
+        {
+            // Pass the flag to the view for the script logic (alert)
+            ViewBag.ShowOnlineAlert = showOnlineAlert;
+
+            // Check if essential data is in TempData (meaning a successful order just happened)
+            if (TempData["OrderId"] == null)
+            {
+                // If the user tries to navigate here directly, redirect them away
+                return RedirectToAction("Index", "Home");
+            }
+
+            // The view will retrieve the order details from TempData
+            return View();
         }
     }
 }

@@ -30,7 +30,9 @@ namespace restapp.Dal
         public DbSet<FoodItem> fooditems { get; set; }
         
         public DbSet<CartItem> Carts { get; set; }
-        
+        public DbSet<Orders> orders { get; set; } // Adds the Orders table
+        public DbSet<OrdersDetail> orderDetails { get; set; } // Adds the OrderDetails table
+
 
         public DbSet<restapp.Models.UserLogin> UserLogin { get; set; } = default!;
         public DbSet<restapp.Models.FoodItem> FoodItem { get; set; } = default!;
