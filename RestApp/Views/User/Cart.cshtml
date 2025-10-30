@@ -1,0 +1,117 @@
+﻿@{
+    ViewData["Title"] = "Cart";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@using restapp.Controllers 
+@model List<CartItem>
+
+@{
+    ViewData["Title"] = "Your Cart";
+    decimal cartTotal = 0;
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12 text-center mb-4">
+            <h2 class="text-primary-blue">🛒 Shopping Cart</h2>
+            <hr />
+        </div>
+    </div>
+
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="row">
+            <div class="col-lg-8">
+                @foreach (var item in Model)
+                {
+                    // Calculate item subtotal and add to grand total
+                    decimal itemSubtotal = item.Price * item.Quantity;
+                    cartTotal += itemSubtotal;
+
+                    // --- Cart Item Row ---
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="card-title mb-1">@item.Name</h5>
+                                    <p class="text-muted mb-0">Price: ₹@item.Price</p>
+                                </div>
+                                
+                                <div class="d-flex align-items-center">
+                                    
+                                    <div class="quantity-selector me-3">
+                                        
+                                        <form asp-controller="User" asp-action="RemoveFromCartSubmit" method="post" style="display:inline;">
+                                            <input type="hidden" name="id" value="@item.FoodItemId" />
+                                            <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                                            <button type="submit" class="quantity-btn" title="Reduce quantity by 1" @(item.Quantity <= 1 ? "disabled" : "")>
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                        </form>
+                                        
+                                        <span class="item-quantity">@item.Quantity</span>
+                                        
+                                        <form asp-controller="User" asp-action="AddToCartSubmit" method="post" style="display:inline;">
+                                            <input type="hidden" name="id" value="@item.FoodItemId" />
+                                            <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                                            <button type="submit" class="quantity-btn" title="Increase quantity by 1">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </form>
+
+                                    </div>
+                                    <span class="fw-bold fs-5 me-3" style="min-width: 100px; text-align: right;">
+                                        ₹@itemSubtotal
+                                    </span>
+                                    
+                                    <form asp-controller="User" asp-action="RemoveItemFullyFromCart" method="post" style="display:inline;">
+                                        <input type="hidden" name="id" value="@item.FoodItemId" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                title="Remove item entirely from cart"
+                                                onclick="return confirm('Are you sure you want to remove all @item.Name from your cart?');">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @* --- Cart Summary (Sidebar) --- *@
+            <div class="col-lg-4">
+                <div class="card bg-light p-3 shadow-sm sticky-top" style="top: 80px;">
+                    <h4 class="mb-3">Order Summary</h4>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Subtotal (@Model.Count items)</span>
+                            <span class="fw-bold">₹@cartTotal</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between text-success">
+                            <span>Delivery Fee</span>
+                            <span>FREE</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between fw-bold fs-5">
+                            <span>Total</span>
+                            <span>₹@cartTotal</span>
+                        </li>
+                    </ul>
+                    <a href="@Url.Action("Checkout", "User")" class="btn btn-success mt-4">Proceed to Payment</a>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center" role="alert">
+            Your cart is empty. Start adding some delicious items!
+        </div>
+        <div class="text-center">
+            <a href="@Url.Action("Index", "Home")" class="btn btn-primary">Go to Menu</a>
+        </div>
+    }
+</div>

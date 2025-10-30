@@ -259,5 +259,189 @@ namespace restapp.Controllers
                 return View(updatedUser);
             }
         }
+        // Inside UserController.cs, add this new action:
+
+        
+
+        public IActionResult Cart()
+        {
+            // 1. Authorization Check (Optional, but good practice)
+            string? loggedInUserRole = HttpContext.Session.GetString("loggedinuserRole");
+            if (loggedInUserRole != "User")
+            {
+                // If not logged in as a user, redirect them (e.g., to login or home)
+                return RedirectToAction("Index", "Home");
+            }
+
+            // 2. Retrieve Cart Data from Session
+            List<CartItem> cart = new List<CartItem>();
+            string? cartJson = HttpContext.Session.GetString("ShoppingCart");
+
+            if (!string.IsNullOrEmpty(cartJson))
+            {
+                // Deserialize the JSON string back into a List<CartItem>
+                // Ensure Newtonsoft.Json is imported if not already.
+                cart = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CartItem>>(cartJson) ?? new List<CartItem>();
+            }
+
+            // 3. Return the List of CartItems to a View named 'Cart.cshtml'
+            return View(cart);
+        }
+
+        // --- HELPER METHODS FOR CART MANAGEMENT (Add these inside UserController) ---
+
+        // Helper to get cart from session
+        private List<CartItem> GetCartFromSession()
+        {
+            // Uses the session key "ShoppingCart"
+            string? cartJson = HttpContext.Session.GetString("ShoppingCart");
+
+            // Checks if the session string is null/empty and deserializes if found
+            return string.IsNullOrEmpty(cartJson)
+                   ? new List<CartItem>()
+                   : Newtonsoft.Json.JsonConvert.DeserializeObject<List<CartItem>>(cartJson) ?? new List<CartItem>();
+        }
+
+        // Helper to save cart to session
+        private void SaveCartToSession(List<CartItem> cart)
+        {
+            string updatedCartJson = Newtonsoft.Json.JsonConvert.SerializeObject(cart);
+            HttpContext.Session.SetString("ShoppingCart", updatedCartJson);
+        }
+        // Inside UserController.cs, add/replace these methods:
+
+        // --- Helper to determine the redirect location ---
+        private string GetRedirectAction(string categoryName)
+        {
+            // Assuming you are using a 'ByCategory' action in the Home controller
+            // or you can redirect back to a generic Menu action.
+            // Adjust this to match your actual menu action.
+            return Url.Action("ByCategory", "Home", new { category = categoryName }) ?? Url.Action("Menu", "Home");
+        }
+
+
+        [HttpPost]
+        public IActionResult AddToCartSubmit(int id, string returnUrl) // 'id' is FoodItem.Id
+        {
+            // You should modify your view to pass the current category name or return URL
+            // so you can redirect back to the correct page after updating the cart.
+
+            // 1. Authorization & Fetch Item (Same as before)
+            // ...
+            var foodItem = _context.fooditems.FirstOrDefault(f => f.ItemId == id);
+            // ... (Error handling if item not found) ...
+
+            // 2. Get/Update Cart (Same logic as before)
+            List<CartItem> cart = GetCartFromSession();
+            CartItem? existingItem = cart.FirstOrDefault(item => item.FoodItemId == id);
+
+            if (existingItem != null)
+            {
+                existingItem.Quantity++;
+            }
+            else
+            {
+                var newCartItem = new CartItem
+                {
+                    FoodItemId = foodItem.ItemId,
+                    Name = foodItem.ItemName,
+                    Price = foodItem.SellingPrice,
+                    Quantity = 1
+                };
+                cart.Add(newCartItem);
+            }
+
+            // 3. Save and Redirect
+            SaveCartToSession(cart);
+            TempData["SuccessMessage"] = $"{foodItem.ItemName} added to cart!";
+
+            // Redirect back to the page the user was on
+            if (!string.IsNullOrEmpty(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            return RedirectToAction("Menu", "Home"); // Fallback
+        }
+
+
+        [HttpPost]
+        public IActionResult RemoveFromCartSubmit(int id, string returnUrl)
+        {
+            // 1. Authorization (Check the role if needed, though for cart operations, 
+            // it’s often okay as long as the session cart is protected)
+            // ... your existing authorization logic here if any ...
+
+            // 2. Get/Update Cart
+            List<CartItem> cart = GetCartFromSession();
+            CartItem? existingItem = cart.FirstOrDefault(item => item.FoodItemId == id);
+
+            if (existingItem != null)
+            {
+                // DECREASE QUANTITY BY ONE
+                existingItem.Quantity--;
+
+                if (existingItem.Quantity <= 0)
+                {
+                    // REMOVE ITEM if quantity hits zero
+                    cart.Remove(existingItem);
+                    TempData["SuccessMessage"] = $"{existingItem.Name} has been completely removed from your cart.";
+                }
+                else
+                {
+                    // QUANTITY DECREASED
+                    TempData["SuccessMessage"] = $"{existingItem.Name} quantity reduced to {existingItem.Quantity}.";
+                }
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Could not find item in cart to reduce quantity.";
+            }
+
+            // 3. Save and Redirect
+            SaveCartToSession(cart);
+
+            // Redirect back to the page the user was on (Menu or Cart)
+            if (!string.IsNullOrEmpty(returnUrl))
+            {
+                // This is important for handling quantity changes on the Cart page itself.
+                return Redirect(returnUrl);
+            }
+            return RedirectToAction("Menu", "Home"); // Fallback
+        }
+        // NEW: Action to remove a specific item completely from the cart list, regardless of quantity.
+        [HttpPost]
+        public IActionResult RemoveItemFullyFromCart(int id)
+        {
+            // 1. Authorization Check (Ensures only a User can delete items)
+            string? loggedInUserRole = HttpContext.Session.GetString("loggedinuserRole");
+            if (loggedInUserRole != "User")
+            {
+                TempData["ErrorMessage"] = "Unauthorized action.";
+                return RedirectToAction("Login", "User");
+            }
+
+            // 2. Get Cart from Session
+            List<CartItem> cart = GetCartFromSession();
+            CartItem? existingItem = cart.FirstOrDefault(item => item.FoodItemId == id);
+            string itemName = "Item";
+
+            if (existingItem != null)
+            {
+                itemName = existingItem.Name;
+
+                // Remove the item entirely from the cart list
+                cart.Remove(existingItem);
+
+                TempData["SuccessMessage"] = $"{itemName} has been completely removed from your cart.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Could not find item in cart to remove.";
+            }
+
+            // 3. Save the updated Cart and Redirect
+            SaveCartToSession(cart);
+            return RedirectToAction("Cart"); // Redirect back to the Cart view
+        }
     }
 }

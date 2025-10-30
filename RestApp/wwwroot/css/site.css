@@ -60,56 +60,84 @@ body {
         color: #833AB4;
         transform: scale(1.2);
     }
+/* Custom Dark Blue Color Definition */
+.bg-dark-blue {
+    /* Choose a standard dark blue, e.g., Navy Blue */
+    background-color: #000080 !important;
+    /* Optional: Remove the background image gradient if you keep the .navbar rule below */
+    background: none !important;
+}
+
 /* Modern Navbar Styling */
-.navbar {
-    background: radial-gradient(circle,rgba(240, 231, 153, 1) 0%, rgba(240, 240, 230, 1) 100%);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    padding: 12px 20px;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+/* ----------------------------------------------------------- */
+/* 1. FORCE DARK BLUE BACKGROUND ON NAV BAR */
+/* ----------------------------------------------------------- */
+/* Use a highly specific selector and !important on the custom class */
+nav.navbar.bg-dark-blue {
+    background-color: #000080 !important; /* Navy Blue */
+    background-image: none !important; /* Critical: Ensure no gradient overrides this */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
-
-.navbar-brand {
-    font-size: 1.8rem;
+/* ----------------------------------------------------------- */
+/* 2. FORCE WHITE TEXT FOR ALL NAVBAR ELEMENTS */
+/* ----------------------------------------------------------- */
+nav.navbar .navbar-brand {
+    color: #FFFFFF !important; /* White color for "Flavour Hub" */
     font-weight: 700;
-    color: #00008B !important;
 }
 
-.navbar-nav .nav-link {
-    font-size: 1rem;
-    color:#333;
-    margin-right: 15px;
-    position: relative;
+nav.navbar .navbar-nav .nav-link {
+    color: #FFFFFF !important; /* White text for "Home", "Menu", "Login", etc. */
     transition: color 0.3s ease;
 }
 
-    .navbar-nav .nav-link:hover {
-        color: #258cfb;
+    nav.navbar .navbar-nav .nav-link:hover {
+        color: #ADD8E6 !important; /* Light blue on hover */
     }
 
-    /* Hover underline animation */
-    .navbar-nav .nav-link::after {
-        content: '';
-        position: absolute;
-        width: 0%;
-        height: 2px;
-        bottom: 0;
-        left: 0;
-        background-color: #00008B;
-        transition: width 0.3s ease;
+    /* Ensure icons (like the shopping cart) are white */
+    nav.navbar .navbar-nav .nav-link i.fas {
+        color: #FFFFFF !important;
     }
 
-    .navbar-nav .nav-link:hover::after {
-        width: 100%;
+/* Ensure the hover underline uses the contrasting light color */
+nav.navbar .nav-link::after {
+    background-color: #ADD8E6; /* Light blue underline */
+}
+
+/* ----------------------------------------------------------- */
+/* 3. FIX FOR BOOTSTRAP TOGGLE ICON ON DARK BACKGROUNDS */
+/* ----------------------------------------------------------- */
+/* Ensures the hamburger icon is visible on mobile */
+.navbar-toggler-icon {
+    filter: invert(1);
+}
+
+/* ----------------------------------------------------------- */
+/* FOOTER STYLING: Apply Dark Blue Theme */
+/* ----------------------------------------------------------- */
+
+/* Force background color */
+nav.navbar.bg-dark-blue,
+footer.bg-dark-blue {
+    background-color: #000080 !important; /* Navy Blue */
+    background-image: none !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+    /* Style the links inside the dark blue footer */
+    footer.bg-dark-blue a {
+        color: #ADD8E6 !important; /* Light blue for visibility */
+        text-decoration: none;
+        transition: color 0.3s ease;
     }
 
-    /* Active link styling */
-    .navbar-nav .nav-link.active {
-        color: #258cfb;
-        font-weight: 600;
-    }
+        footer.bg-dark-blue a:hover {
+            color: #FFFFFF !important; /* White on hover */
+            text-decoration: underline;
+        }
+
 
 /* Custom styles for Admin Dashboard cards */
 .dashboard-card {
@@ -339,3 +367,4 @@ body {
     opacity: 0;
     transition: opacity 0.3s ease-out;
 }
+
