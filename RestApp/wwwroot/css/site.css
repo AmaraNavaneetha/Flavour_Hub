@@ -31,9 +31,11 @@ body {
 }
 .info-section {
     padding: 20px;
-    background: radial-gradient(circle,rgba(240, 231, 153, 1) 0%, rgba(240, 240, 230, 1) 100%);
-    border-radius: 8px;
-    margin-bottom: 20px;
+    background: url(/wwwroot/Images/Sliders/Slider2.jpg) no-repeat center center;
+    background-size: cover; /* Ensures full coverage */
+    padding: 20px;
+    border-radius: 12px;
+    color: #333;
     text-align: center;
 }
 
@@ -62,6 +64,14 @@ body {
     }
 /* Modern Navbar Styling */
 .navbar {
+    background: radial-gradient(circle,rgba(240, 231, 153, 1) 0%, rgba(240, 240, 230, 1) 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 12px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+.footer {
     background: radial-gradient(circle,rgba(240, 231, 153, 1) 0%, rgba(240, 240, 230, 1) 100%);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     padding: 12px 20px;
